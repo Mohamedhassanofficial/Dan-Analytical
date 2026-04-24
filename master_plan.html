@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dan Analytical — Master Plan | الخطة الرئيسية</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #162849;
+    --navy-light: #2c3e63;
+    --ink: #1a2233;
+    --muted: #5a6578;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --teal: #2aa8b0;
+    --red: #c0392b;
+    --green: #059669;
+    --amber: #d97706;
+    --blue-bg: #e7f1ff;
+    --green-bg: #d1fae5;
+    --amber-bg: #fef3c7;
+    --red-bg: #fee2e2;
+    --gray-bg: #f1f5f9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    padding: 0;
+  }
+  .ar {
+    font-family: 'IBM Plex Sans Arabic', 'Tajawal', system-ui, sans-serif;
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 48px 32px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  header .sub {
+    font-size: 16px;
+    opacity: 0.85;
+    font-weight: 300;
+  }
+  header .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  header .logo {
+    width: 42px;
+    height: 42px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--navy);
+    font-weight: 800;
+  }
+  header .brand {
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  /* ============ STATS BAR ============ */
+  .stats {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+  }
+  .stats-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .stat {
+    text-align: center;
+    padding: 12px;
+  }
+  .stat-num {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============ CONTENT ============ */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 32px 60px;
+  }
+
+  /* ============ PHASE CARD ============ */
+  .phase {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 28px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(22, 40, 73, 0.04);
+  }
+  .phase-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: linear-gradient(to right, rgba(22, 40, 73, 0.02), transparent);
+  }
+  .phase-title-en {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .phase-title-ar {
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--navy);
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    direction: rtl;
+    text-align: right;
+  }
+  .phase-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--navy);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .status.done { background: var(--green-bg); color: var(--green); }
+  .status.progress { background: var(--amber-bg); color: var(--amber); }
+  .status.planned { background: var(--gray-bg); color: var(--muted); }
+
+  .phase-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 240px;
+  }
+  .phase-col {
+    padding: 24px 28px;
+  }
+  .phase-col.en {
+    border-right: 1px solid var(--border);
+  }
+  .phase-col.ar {
+    direction: rtl;
+    text-align: right;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background: #fcfcfd;
+  }
+  .phase-col h3 {
+    font-size: 13px;
+    color: var(--navy);
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .phase-col h3::before {
+    content: '▸ ';
+    color: var(--teal);
+  }
+  .phase-col.ar h3::before {
+    content: '◂ ';
+  }
+  .phase-col p, .phase-col li {
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+  .phase-col.ar p, .phase-col.ar li {
+    font-size: 15px;
+    line-height: 1.85;
+  }
+  .phase-col ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+  .phase-col li {
+    padding: 3px 0 3px 22px;
+    position: relative;
+  }
+  .phase-col.ar li {
+    padding: 3px 22px 3px 0;
+  }
+  .phase-col li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 12px;
+    width: 6px;
+    height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+  }
+  .phase-col.ar li::before {
+    left: auto;
+    right: 4px;
+  }
+  .phase-col li.check::before {
+    content: '✓';
+    background: transparent;
+    color: var(--green);
+    font-weight: 700;
+    top: 3px;
+    font-size: 14px;
+    width: auto;
+    height: auto;
+  }
+
+  .meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .meta span strong {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  /* ============ DATA CARD ============ */
+  .data-card {
+    background: linear-gradient(135deg, #162849 0%, #2c3e63 100%);
+    color: white;
+    padding: 32px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+  }
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+  }
+  .data-col {
+    font-size: 14.5px;
+    line-height: 1.8;
+  }
+  .data-col.ar {
+    direction: rtl;
+    text-align: right;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+  .data-card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .data-card h2.ar {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+  .data-card .big-nums {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    flex-wrap: wrap;
+  }
+  .data-card .big-num {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .data-card .big-num b {
+    font-size: 28px;
+    font-weight: 700;
+    color: #9fd8dd;
+  }
+  .data-card .big-num span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============ SECTION HEADER ============ */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 40px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--navy);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .section-title .ar {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 600;
+  }
+
+  /* ============ DELIVERABLES TABLE ============ */
+  .deliverables {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .deliverables table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .deliverables th {
+    background: var(--navy);
+    color: white;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .deliverables td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .deliverables tr:last-child td {
+    border-bottom: none;
+  }
+  .deliverables code {
+    background: var(--gray-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+  }
+  .ok-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--green-bg);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============ NEXT CARD ============ */
+  .next-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #f59e0b;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .next-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #78350f;
+    margin-bottom: 10px;
+  }
+  .next-card h3.ar {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+  .next-card p {
+    font-size: 14.5px;
+    color: #78350f;
+    line-height: 1.75;
+  }
+  .next-card .ar {
+    direction: rtl;
+    text-align: right;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.7);
+    padding: 32px;
+    text-align: center;
+    font-size: 13px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 820px) {
+    .phase-body, .data-grid, .next-card, .stats-grid { grid-template-columns: 1fr; }
+    .phase-col.en { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  @media print {
+    body { background: white; }
+    .phase { break-inside: avoid; box-shadow: none; }
+    header { background: var(--navy) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-row">
+    <div class="logo">DA</div>
+    <div class="brand">Dan Analytical</div>
+  </div>
+  <h1>Portfolio Optimization Platform — Master Plan</h1>
+  <div class="sub">منصة تحسين المحفظة الاستثمارية — الخطة الرئيسية · Harry Markowitz Theory · Tadawul</div>
+</header>
+
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Phases · مراحل</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">234</div>
+      <div class="stat-label">Tadawul stocks · أسهم تداول</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">10<span style="font-size:18px">yr</span></div>
+      <div class="stat-label">Index history · بيانات المؤشرات</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">133</div>
+      <div class="stat-label">UI screens · شاشات</div>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<!-- ============ DATA ASSETS ============ -->
+<div class="data-card">
+  <div class="data-grid">
+    <div class="data-col">
+      <h2>Data assets now available</h2>
+      <p style="opacity:0.85; margin-top:8px; font-size:13px">Grounded in the files you uploaded:</p>
+      <ul style="list-style:none; padding:0; margin-top:12px;">
+        <li style="padding:4px 0">• <b>Stock-List-Arabic-and-English.xlsx</b> — 234 Tadawul symbols with Arabic + English names across 21 industries</li>
+        <li style="padding:4px 0">• <b>Index-Data-From-28-02-2016-To-26-02-2026.csv</b> — 10 years of sector index OHLCV (44,506 rows, 21 sectors)</li>
+        <li style="padding:4px 0">• <b>Portflio_Optimization_Tadawul_ver_final_vertest3mohd.xlsm</b> — the reference Excel model with Solver</li>
+        <li style="padding:4px 0">• <b>Web-Design-Portfolio-Optimization-Requirements2.pptx</b> — 133 screens of UI specification</li>
+        <li style="padding:4px 0">• <b>شاشة تحليل أداء الأسهم.pptx</b> — stock analysis screen (additional spec)</li>
+      </ul>
+    </div>
+    <div class="data-col ar">
+      <h2 class="ar">الأصول البيانية المتوفرة الآن</h2>
+      <p style="opacity:0.85; margin-top:8px; font-size:13px">مبني على الملفات التي رفعتها:</p>
+      <ul style="list-style:none; padding:0; margin-top:12px;">
+        <li style="padding:4px 0">• <b>قائمة الأسهم (عربي + إنجليزي)</b> — ٢٣٤ سهماً في تداول موزعة على ٢١ قطاعاً</li>
+        <li style="padding:4px 0">• <b>بيانات المؤشرات ٢٠١٦–٢٠٢٦</b> — ١٠ سنوات من بيانات المؤشرات القطاعية (٤٤,٥٠٦ صفاً، ٢١ قطاعاً)</li>
+        <li style="padding:4px 0">• <b>نموذج الإكسل المرجعي</b> — يحتوي على Solver ومصفوفة التباين وكل المعادلات</li>
+        <li style="padding:4px 0">• <b>عرض تصميم الويب</b> — ١٣٣ شاشة مواصفات</li>
+        <li style="padding:4px 0">• <b>شاشة تحليل الأسهم</b> — مواصفات إضافية</li>
+      </ul>
+    </div>
+  </div>
+  <div class="big-nums">
+    <div class="big-num"><b>6</b><span>sectors with full 10yr coverage · قطاعات بتغطية كاملة</span></div>
+    <div class="big-num"><b>21</b><span>industries tracked · صناعات</span></div>
+    <div class="big-num"><b>44,506</b><span>historical data points · نقاط تاريخية</span></div>
+    <div class="big-num"><b>2,497</b><span>trading days · أيام تداول</span></div>
+  </div>
+</div>
+
+<!-- ============ PHASES ============ -->
+<h2 class="section-title"><span>Project phases</span><span class="ar">مراحل المشروع</span></h2>
+
+<!-- ============ PHASE 0 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">0</div>Foundation</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ٠ — الأساس</div>
+    </div>
+    <span class="status done">✓ Done · مكتمل</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Prove the math, lock in the architecture, verify parity with the Excel Solver.</p>
+      <h3 style="margin-top:16px">Delivered</h3>
+      <ul>
+        <li class="check">Portfolio optimizer (SLSQP + Cornuejols-Tütüncü QP)</li>
+        <li class="check">FastAPI service skeleton (3 endpoints)</li>
+        <li class="check">Excel parity notebook — portfolio return diff = 0.00</li>
+        <li class="check">React dashboard demo (Dan Analytical brand)</li>
+        <li class="check">Saudi Build Reference (11-topic research doc)</li>
+        <li class="check">Excel → Python cell mapping</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> completed</span>
+        <span><strong>Effort:</strong> 3 turns</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>إثبات صحة المعادلات، تثبيت البنية المعمارية، والتحقق من تطابق النتائج مع Solver الخاص بالإكسل.</p>
+      <h3 style="margin-top:16px">ما تم إنجازه</h3>
+      <ul>
+        <li class="check">محرك التحسين (SLSQP + QP)</li>
+        <li class="check">هيكل خدمة FastAPI (٣ مسارات)</li>
+        <li class="check">دفتر تحقق التطابق مع الإكسل — الفرق = صفر</li>
+        <li class="check">نموذج تجريبي للوحة التحكم (علامة Dan Analytical)</li>
+        <li class="check">المرجع الشامل (١١ موضوعاً بحثياً)</li>
+        <li class="check">خريطة الخلايا من الإكسل إلى Python</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> مكتملة</span>
+        <span><strong>الجهد:</strong> ٣ جولات</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 1 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">1</div>Data layer</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ١ — طبقة البيانات</div>
+    </div>
+    <span class="status progress">● In progress · قيد التنفيذ</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Ingest the 234-stock list and 10-year index history into PostgreSQL; build a nightly refresh job for individual stock prices via EODHD (primary) + yfinance (dev fallback).</p>
+      <h3 style="margin-top:16px">Deliverables</h3>
+      <ul>
+        <li>PostgreSQL schema: <code>stocks</code>, <code>stock_prices</code>, <code>market_indices</code>, <code>risk_free_rates</code></li>
+        <li>Seed script loading 234 real Tadawul symbols</li>
+        <li>Bulk loader for 10-year index CSV (44,506 rows)</li>
+        <li>EODHD daily refresh (commercial license)</li>
+        <li>TimescaleDB hypertable option + monthly partitions</li>
+        <li>Data quality checks: no gaps, corporate action adjustments</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> 2 weeks</span>
+        <span><strong>Dependencies:</strong> AWS KSA region</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>إدخال قائمة الـ٢٣٤ سهماً وبيانات المؤشرات لعشر سنوات في PostgreSQL، وبناء وظيفة تحديث ليلي لأسعار الأسهم الفردية عبر EODHD (الأساسي) + yfinance (للتطوير).</p>
+      <h3 style="margin-top:16px">المخرجات</h3>
+      <ul>
+        <li>هيكل قاعدة البيانات: <code>stocks</code>، <code>stock_prices</code>، <code>market_indices</code>، <code>risk_free_rates</code></li>
+        <li>سكربت تهيئة يحمّل ٢٣٤ رمزاً حقيقياً من تداول</li>
+        <li>محمّل جماعي لملف المؤشرات (٤٤,٥٠٦ صفاً)</li>
+        <li>تحديث يومي عبر EODHD (ترخيص تجاري)</li>
+        <li>خيار TimescaleDB + تقسيم شهري</li>
+        <li>فحوصات جودة البيانات: لا فجوات، تسوية الإجراءات</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> أسبوعان</span>
+        <span><strong>المتطلبات:</strong> منطقة AWS السعودية</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 2 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">2</div>Quant engine complete</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ٢ — محرك الحسابات المالية</div>
+    </div>
+    <span class="status progress">● In progress · قيد التنفيذ</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Round out the quant engine beyond the core Solver: VaR, CAPM/Beta pipeline, correlation analysis, and backtests — every formula mapped to a specific Excel cell.</p>
+      <h3 style="margin-top:16px">Deliverables</h3>
+      <ul>
+        <li>VaR engine — parametric + historical + Monte Carlo (GARCH-t) at 95% and 99%</li>
+        <li>CAPM pipeline — OLS regression against TASI + sector indices, Blume adjustment</li>
+        <li>Covariance with Ledoit-Wolf shrinkage</li>
+        <li>Correlation matrix with Pearson Formula 2 cross-check</li>
+        <li>Backtesting — Kupiec POF + Christoffersen conditional coverage</li>
+        <li>Expected Shortfall (CVaR) at 97.5% (Basel FRTB)</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> 3 weeks</span>
+        <span><strong>Parity target:</strong> |diff| < 1e-4 vs Excel</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>استكمال محرك الحسابات إلى ما بعد المحسّن الأساسي: حساب VaR، خط أنابيب CAPM/Beta، تحليل الارتباط، واختبارات التحقق الخلفي.</p>
+      <h3 style="margin-top:16px">المخرجات</h3>
+      <ul>
+        <li>محرك VaR — معياري + تاريخي + Monte Carlo (GARCH-t) عند ٩٥٪ و٩٩٪</li>
+        <li>خط أنابيب CAPM — انحدار OLS مقابل TASI + المؤشرات القطاعية</li>
+        <li>مصفوفة التباين مع انكماش Ledoit-Wolf</li>
+        <li>مصفوفة الارتباط مع تحقق الصيغة الثانية (Pearson)</li>
+        <li>اختبارات Kupiec POF + Christoffersen</li>
+        <li>الخسارة المتوقعة (CVaR) عند ٩٧.٥٪ (Basel FRTB)</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> ٣ أسابيع</span>
+        <span><strong>هدف المطابقة:</strong> الفرق < ١ × ١٠⁻⁴</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 3 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">3</div>Backend &amp; authentication</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ٣ — الخادم والمصادقة</div>
+    </div>
+    <span class="status planned">○ Planned · مخطط</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Build the PDPL-compliant auth stack: Nafath primary + email/password fallback, session management via Redis, full audit trail meeting SAMA 10-year retention.</p>
+      <h3 style="margin-top:16px">Deliverables</h3>
+      <ul>
+        <li>FastAPI auth routes: registration, login, MFA, session refresh</li>
+        <li>National ID validation (Hawiya/Iqama Luhn-variant checksum)</li>
+        <li>Nafath integration via licensed TCC provider</li>
+        <li>Argon2id password hashing + HaveIBeenPwned blocklist check</li>
+        <li>Redis session store with 15min idle / 8hr absolute timeout</li>
+        <li>Immutable audit log (audit.audit_log, SAMA 10-year retention)</li>
+        <li>Step-up re-authentication for sensitive actions</li>
+        <li>Mandatory disclaimer acceptance before analytics access</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> 4 weeks</span>
+        <span><strong>Blocker:</strong> Nafath contract with TCC</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>بناء طبقة المصادقة المتوافقة مع PDPL: نفاذ كأساس + بريد/كلمة مرور كاحتياط، إدارة الجلسات عبر Redis، وسجل تدقيق كامل يلبي متطلبات ساما.</p>
+      <h3 style="margin-top:16px">المخرجات</h3>
+      <ul>
+        <li>مسارات المصادقة في FastAPI: تسجيل، دخول، مصادقة ثنائية</li>
+        <li>التحقق من الهوية الوطنية (هوية/إقامة، خوارزمية Luhn)</li>
+        <li>تكامل نفاذ عبر مزود TCC مرخّص</li>
+        <li>تجزئة كلمات المرور بـ Argon2id + فحص قائمة HIBP</li>
+        <li>مخزن جلسات Redis: ١٥ دقيقة خمول / ٨ ساعات مطلق</li>
+        <li>سجل تدقيق غير قابل للتعديل (احتفاظ ١٠ سنوات ساما)</li>
+        <li>إعادة مصادقة مشددة للعمليات الحساسة</li>
+        <li>قبول إلزامي لإخلاء المسؤولية قبل الوصول للأدوات</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> ٤ أسابيع</span>
+        <span><strong>العائق:</strong> عقد نفاذ مع TCC</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 4 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">4</div>Frontend — 133 screens</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ٤ — الواجهة الأمامية (١٣٣ شاشة)</div>
+    </div>
+    <span class="status planned">○ Planned · مخطط</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Build every screen from the PowerPoint spec as bilingual (Ar RTL / En LTR) React components with seamless direction toggle.</p>
+      <h3 style="margin-top:16px">Deliverables</h3>
+      <ul>
+        <li>Main portfolio dashboard (KPIs, risk indicators, Sharpe, VaR, risk level)</li>
+        <li>Stock analysis screen (analyzed from the extra PPT file you uploaded)</li>
+        <li>Portfolio weights editor with live recalc + Solver button</li>
+        <li>Efficient frontier chart (Recharts) with tangency marker</li>
+        <li>Correlation matrix heatmap (6×6 for portfolio, 21×21 for sectors)</li>
+        <li>VaR dashboard with configurable horizon + target-loss alerts</li>
+        <li>Educational modules (Markowitz theory, CAPM, VaR)</li>
+        <li>PDF export of reports with Arabic RTL rendering</li>
+        <li>All buttons disabled until login + payment complete</li>
+        <li>Full react-i18next setup with ICU Arabic plurals</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> 8 weeks</span>
+        <span><strong>Stack:</strong> Vite + React 19 + Tailwind v4</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>بناء كل شاشة من مواصفات PowerPoint كمكونات React ثنائية اللغة (عربي RTL / إنجليزي LTR) مع تبديل سلس للاتجاه.</p>
+      <h3 style="margin-top:16px">المخرجات</h3>
+      <ul>
+        <li>لوحة المحفظة الرئيسية (المؤشرات، المخاطر، شارب، VaR)</li>
+        <li>شاشة تحليل الأسهم (من ملف الـ PPT الإضافي)</li>
+        <li>محرر أوزان المحفظة مع إعادة حساب فورية + زر Solver</li>
+        <li>منحنى الكفاءة (Recharts) مع علامة النقطة المثلى</li>
+        <li>خريطة حرارية لمصفوفة الارتباط (٦×٦ للمحفظة، ٢١×٢١ للقطاعات)</li>
+        <li>لوحة VaR مع أفق قابل للتهيئة + تنبيهات الخسائر المستهدفة</li>
+        <li>وحدات تعليمية (نظرية ماركويتز، CAPM، VaR)</li>
+        <li>تصدير تقارير PDF مع دعم العربية RTL</li>
+        <li>تعطيل كل الأزرار حتى إتمام الدخول والدفع</li>
+        <li>إعداد react-i18next كامل مع صيغ الجمع العربية ICU</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> ٨ أسابيع</span>
+        <span><strong>البنية:</strong> Vite + React 19 + Tailwind v4</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 5 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">5</div>Admin panel</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ٥ — لوحة الإدارة</div>
+    </div>
+    <span class="status planned">○ Planned · مخطط</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Build the operations console that lets support, compliance, and engineering run the platform day-to-day without SQL access.</p>
+      <h3 style="margin-top:16px">Deliverables</h3>
+      <ul>
+        <li>Risk-free rate editor (versioned with effective dates, SAMA source)</li>
+        <li>Tadawul stock list manager (add, update, soft-delete)</li>
+        <li>Data refresh control panel (manual trigger + nightly cron history)</li>
+        <li>Historical data bulk upload (Excel template)</li>
+        <li>Field labels &amp; tooltip editor (bilingual)</li>
+        <li>User management with PDPL-compliant PII masking</li>
+        <li>Audit log viewer with JSON diff + CSV export</li>
+        <li>RBAC: super-admin, compliance, support, read-only auditor</li>
+        <li>Break-glass procedure for emergency access</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> 4 weeks</span>
+        <span><strong>Stack:</strong> React Admin + Shadcn Admin Kit</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>بناء كونسول التشغيل الذي يتيح لفرق الدعم والامتثال والهندسة إدارة المنصة يومياً بدون حاجة لـ SQL.</p>
+      <h3 style="margin-top:16px">المخرجات</h3>
+      <ul>
+        <li>محرر المعدل الخالي من المخاطر (مع تواريخ سريان، مصدر ساما)</li>
+        <li>مدير قائمة أسهم تداول (إضافة، تعديل، حذف ناعم)</li>
+        <li>لوحة تحديث البيانات (يدوي + تاريخ الجدولة الليلية)</li>
+        <li>رفع جماعي للبيانات التاريخية (قالب إكسل)</li>
+        <li>محرر تسميات الحقول وتلميحاتها (ثنائي اللغة)</li>
+        <li>إدارة المستخدمين مع إخفاء PII متوافق مع PDPL</li>
+        <li>عارض سجل التدقيق مع JSON diff + تصدير CSV</li>
+        <li>RBAC: مدير عام، امتثال، دعم، مدقق للقراءة</li>
+        <li>إجراء الوصول الطارئ (Break-glass)</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> ٤ أسابيع</span>
+        <span><strong>البنية:</strong> React Admin + Shadcn Admin Kit</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 6 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">6</div>Payment &amp; subscriptions</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ٦ — الدفع والاشتراكات</div>
+    </div>
+    <span class="status planned">○ Planned · مخطط</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Integrate PayTabs as the primary gateway (mada + Visa/MC + Apple Pay + STC Pay via PayTabs), with SAQ-A hosted checkout + tokenized recurring billing.</p>
+      <h3 style="margin-top:16px">Deliverables</h3>
+      <ul>
+        <li>PayTabs PayPage hosted checkout (SAQ-A scope)</li>
+        <li>Webhook handler with HMAC-SHA256 signature verification</li>
+        <li>Recurring subscription engine (tokenize:2, server-to-server charges)</li>
+        <li>Account auto-activation + email confirmation on payment success</li>
+        <li>Subscription plans, promo codes, 15% VAT handling</li>
+        <li>Refund and void workflows</li>
+        <li>Reconciliation dashboard in admin panel</li>
+        <li>PDF invoices with ZATCA-compliant QR codes</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> 3 weeks</span>
+        <span><strong>Blocker:</strong> PayTabs KSA merchant account</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>دمج PayTabs كبوابة دفع أساسية (مدى + فيزا/ماستركارد + Apple Pay + STC Pay عبر PayTabs)، مع صفحة دفع SAQ-A + فوترة متكررة برموز محفوظة.</p>
+      <h3 style="margin-top:16px">المخرجات</h3>
+      <ul>
+        <li>صفحة PayTabs PayPage المستضافة (نطاق SAQ-A)</li>
+        <li>معالج Webhook مع تحقق HMAC-SHA256</li>
+        <li>محرك الاشتراكات المتكررة (tokenize:2، شحن خادم-خادم)</li>
+        <li>تفعيل تلقائي للحساب + تأكيد بريد إلكتروني عند نجاح الدفع</li>
+        <li>خطط الاشتراك، كوبونات خصم، ضريبة القيمة المضافة ١٥٪</li>
+        <li>تدفقات الاسترداد والإلغاء</li>
+        <li>لوحة المطابقة المالية في الإدارة</li>
+        <li>فواتير PDF مع رمز QR متوافق مع ZATCA</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> ٣ أسابيع</span>
+        <span><strong>العائق:</strong> حساب تاجر PayTabs السعودي</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 7 ============ -->
+<div class="phase">
+  <div class="phase-header">
+    <div>
+      <div class="phase-title-en"><div class="phase-num">7</div>Production launch</div>
+      <div class="phase-title-ar" style="margin-top:4px; margin-right:58px">المرحلة ٧ — الإطلاق الإنتاجي</div>
+    </div>
+    <span class="status planned">○ Planned · مخطط</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-col en">
+      <h3>Objective</h3>
+      <p>Deploy to AWS me-central-1 Riyadh with full SDAIA/PDPL/SAMA compliance certification; pass internal pen-test and load-test.</p>
+      <h3 style="margin-top:16px">Deliverables</h3>
+      <ul>
+        <li>AWS KSA region setup (VPC, RDS Multi-AZ, CloudFront, KMS CMK)</li>
+        <li>SSL/TLS 1.3, WAF, firewall rules, automated backups (pgBackRest)</li>
+        <li>CI/CD pipeline (GitHub Actions + Terraform)</li>
+        <li>NDGP registration with SDAIA, DPO appointment filing</li>
+        <li>Bilingual privacy policy + ToS + consent flows</li>
+        <li>RoPA (Record of Processing Activities) documentation</li>
+        <li>SCCs for any non-KSA processors + Transfer Risk Assessment</li>
+        <li>Internal penetration test + remediation</li>
+        <li>Load test at 10× expected peak</li>
+        <li>72-hour breach response runbook</li>
+        <li>Observability: Grafana + Prometheus + Sentry</li>
+        <li>Incident response playbook with SAMA notification path</li>
+      </ul>
+      <div class="meta">
+        <span><strong>Duration:</strong> 4 weeks</span>
+        <span><strong>Sign-offs needed:</strong> SDAIA, DPO, Security, Compliance</span>
+      </div>
+    </div>
+    <div class="phase-col ar">
+      <h3>الهدف</h3>
+      <p>النشر على AWS منطقة الرياض (me-central-1) مع شهادة توافق كامل مع SDAIA/PDPL/ساما؛ اجتياز اختبار الاختراق الداخلي واختبار الحمل.</p>
+      <h3 style="margin-top:16px">المخرجات</h3>
+      <ul>
+        <li>إعداد منطقة AWS السعودية (VPC، RDS، CloudFront، KMS)</li>
+        <li>SSL/TLS 1.3، جدار ناري، نسخ احتياطي آلي (pgBackRest)</li>
+        <li>خط CI/CD (GitHub Actions + Terraform)</li>
+        <li>تسجيل في NDGP لدى SDAIA، تقديم DPO</li>
+        <li>سياسة خصوصية وشروط استخدام ثنائية اللغة + تدفقات الموافقة</li>
+        <li>توثيق RoPA (سجل أنشطة المعالجة)</li>
+        <li>SCCs لأي معالجين خارج السعودية + تقييم مخاطر النقل</li>
+        <li>اختبار اختراق داخلي + معالجة الثغرات</li>
+        <li>اختبار الحمل عند ١٠× من الذروة المتوقعة</li>
+        <li>خطة استجابة الاختراق خلال ٧٢ ساعة</li>
+        <li>المراقبة: Grafana + Prometheus + Sentry</li>
+        <li>كتيب الاستجابة مع مسار إبلاغ ساما</li>
+      </ul>
+      <div class="meta">
+        <span><strong>المدة:</strong> ٤ أسابيع</span>
+        <span><strong>الموافقات المطلوبة:</strong> SDAIA، DPO، أمن، امتثال</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DELIVERABLES INDEX ============ -->
+<h2 class="section-title"><span>Deliverables completed so far</span><span class="ar">المخرجات المكتملة حتى الآن</span></h2>
+
+<div class="deliverables">
+  <table>
+    <thead>
+      <tr>
+        <th>File · الملف</th>
+        <th>Purpose · الغرض</th>
+        <th>Status · الحالة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>portfolio_optimizer.py</code></td>
+        <td>Core Solver — max Sharpe via SLSQP &amp; QP · محرك التحسين الأساسي</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+      <tr>
+        <td><code>portfolio_api.py</code></td>
+        <td>FastAPI REST service (3 endpoints) · خدمة REST</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+      <tr>
+        <td><code>excel_parity_test.ipynb</code></td>
+        <td>Jupyter notebook proving Python matches Excel · دفتر إثبات التطابق</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+      <tr>
+        <td><code>dashboard_demo.jsx</code></td>
+        <td>React dashboard with bilingual toggle · لوحة تحكم React ثنائية اللغة</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+      <tr>
+        <td><code>excel_to_code_mapping.md</code></td>
+        <td>Every Excel cell → Python function · خريطة الخلايا للوظائف</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+      <tr>
+        <td>Saudi Build Reference (artifact)</td>
+        <td>11-topic research: SDAIA, PayTabs, EODHD, etc. · المرجع البحثي الشامل</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+      <tr>
+        <td><code>master_plan.html</code> (this file)</td>
+        <td>Bilingual project master plan · الخطة الرئيسية ثنائية اللغة</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+      <tr>
+        <td><code>load_real_tadawul_data.py</code></td>
+        <td>Real-data loader + verification against 10yr index · محمّل البيانات الحقيقية</td>
+        <td><span class="ok-chip">Done · مكتمل</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ NEXT UP ============ -->
+<div class="next-card">
+  <div>
+    <h3>What I recommend building next</h3>
+    <p>Given where we are, the highest-leverage next piece is the <b>complete quant engine</b> (Phase 2) built on the real 10-year sector data you just uploaded. That gives the real Sharpe/VaR/correlation numbers the UI will display, and unblocks the dashboard work to connect to real data instead of the demo fixtures. I'd plan two follow-up turns: (1) VaR + CAPM modules with parity tests, (2) DB schema + seed script loading the 234-stock universe.</p>
+  </div>
+  <div class="ar">
+    <h3 class="ar">ما أوصي ببنائه بعد ذلك</h3>
+    <p>بناءً على وضعنا الحالي، أكبر قيمة مضافة هي إكمال <b>محرك الحسابات المالية الكامل</b> (المرحلة ٢) مبنياً على بيانات المؤشرات الحقيقية التي رفعتها. هذا يعطينا أرقام Sharpe وVaR والارتباط الحقيقية التي ستعرضها الواجهة، ويفتح الطريق لربط لوحة التحكم ببيانات حقيقية بدلاً من العينات التجريبية. أقترح جولتين تاليتين: (١) وحدات VaR وCAPM مع اختبارات التطابق، (٢) هيكل قاعدة البيانات وسكربت التحميل لكل الـ٢٣٤ سهماً.</p>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  Dan Analytical — Portfolio Optimization Platform<br>
+  منصة دان للتحليل المالي — تحسين المحفظة الاستثمارية<br>
+  <span style="opacity:0.5; font-size:11px">Based on the research conducted · مبني على البحث المنجز</span>
+</footer>
+
+</body>
+</html>
