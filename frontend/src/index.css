@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Blue-only theme (per spec): every surface, button, badge, chart uses a
+  shade of brand-* / navy / ink. No orange, teal, amber, or green anywhere.
+  Error state uses high-contrast dark-navy-on-white (or inverted) — not red.
+*/
+
+html {
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  color: theme("colors.ink");
+  background: theme("colors.surface");
+}
+html[dir="rtl"] body {
+  font-family: "IBM Plex Sans Arabic", "Tajawal", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+button {
+  font: inherit;
+}
+
+@layer components {
+  /* ── Buttons ────────────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2
+           text-sm font-medium transition focus:outline-none focus:shadow-focus
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand-700 text-white hover:bg-brand-800;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-brand-800 border border-brand-300 hover:bg-brand-50;
+  }
+  .btn-ghost {
+    @apply btn text-brand-800 hover:bg-brand-50;
+  }
+  .btn-danger {
+    /* Destructive action — stays blue but uses the darkest shade inverted */
+    @apply btn bg-brand-900 text-white hover:bg-midnight;
+  }
+
+  /* ── Form controls ──────────────────────────────────────────── */
+  .input {
+    @apply w-full rounded-md border border-brand-200 bg-white px-3 py-2
+           text-sm text-ink placeholder:text-muted
+           focus:outline-none focus:border-brand-500 focus:shadow-focus;
+  }
+  .label {
+    @apply block text-sm font-medium text-brand-900 mb-1;
+  }
+
+  /* ── Cards ──────────────────────────────────────────────────── */
+  .card {
+    @apply rounded-xl bg-card p-5 shadow-card border border-brand-100;
+  }
+  .stat-card {
+    @apply card flex flex-col gap-1;
+  }
+  .stat-label {
+    @apply text-xs font-medium uppercase tracking-wide text-muted;
+  }
+  .stat-value {
+    @apply text-2xl font-semibold text-brand-900;
+  }
+
+  /* ── Sidebar links ──────────────────────────────────────────── */
+  .nav-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium
+           text-white/75 hover:bg-white/10 hover:text-white transition;
+  }
+  .nav-link-active {
+    @apply nav-link bg-white/15 text-white;
+  }
+
+  /* ── Badges (blue only, differentiated by shade) ────────────── */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .badge-info    { @apply badge bg-brand-100 text-brand-800; }
+  .badge-ok      { @apply badge bg-brand-50  text-brand-700 border border-brand-200; }
+  .badge-warn    { @apply badge bg-brand-200 text-brand-900; }
+  .badge-error   { @apply badge bg-brand-900 text-white; }
+
+  /* ── Screener table primitives ──────────────────────────────── */
+  /* text color intentionally unset here — numeric cells override it via
+     `numToneClass` (positive = ink, zero/negative = danger). Body default
+     covers text cells via `html { color: ink }`.                       */
+  .screener-cell {
+    @apply px-3 py-2 text-sm whitespace-nowrap;
+  }
+  .screener-th {
+    @apply px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white
+           bg-brand-800 border-b border-brand-900 whitespace-nowrap;
+  }
+  .screener-filter-cell {
+    @apply px-2 py-1 bg-brand-50 border-b border-brand-200;
+  }
+  .screener-row-hover {
+    @apply hover:bg-brand-50;
+  }
+}

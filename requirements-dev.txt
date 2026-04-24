@@ -1,0 +1,20 @@
+# Tadawul Portfolio Optimization — development + test dependencies
+# Install alongside runtime: pip install -r requirements.txt -r requirements-dev.txt
+
+-r requirements.txt
+
+# --- Testing ---
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx==0.28.1              # FastAPI TestClient backend
+coverage[toml]==7.6.10
+
+# --- Parity gate (Excel ↔ Python) ---
+jupyter==1.1.1
+nbconvert==7.16.4
+nbclient==0.10.2
+
+# --- Linting / typing ---
+ruff==0.8.6
+mypy==1.14.1
+types-openpyxl==3.1.5.20241126

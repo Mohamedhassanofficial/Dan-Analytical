@@ -1,0 +1,46 @@
+# Tadawul Portfolio Optimization — runtime dependencies
+# Python 3.11+ required (for scipy 1.14 + numpy 2.x compatibility).
+# Install: pip install -r requirements.txt
+
+# --- Core numerics (Phase A + solver) ---
+numpy==2.2.1
+scipy==1.14.1
+pandas==2.2.3
+
+# --- Excel / data ingestion ---
+openpyxl==3.1.5            # .xlsx read/write (stock list, sector upload)
+xlrd==2.0.1                # legacy .xls fallback (Excel uploads from clients)
+
+# --- Market data ---
+yfinance==0.2.50           # daily price refresh for Tadawul tickers
+
+# --- Web framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.7.0   # typed environment config loader
+python-multipart==0.0.20   # required for FastAPI file uploads (Excel admin form)
+
+# --- Database ---
+SQLAlchemy==2.0.36
+alembic==1.14.0
+psycopg2-binary==2.9.10    # PostgreSQL driver (prod)
+asyncpg==0.30.0             # async driver for high-concurrency endpoints
+
+# --- Auth (Phase B, staged here so Alembic user model can import) ---
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+
+# --- PDF export (Phase B) with Arabic shaping support ---
+reportlab==4.2.5
+arabic-reshaper==3.0.0
+python-bidi==0.6.3
+Pillow==11.1.0
+
+# --- Production QP solver (replaces scipy trust-constr at n=234) ---
+cvxpy==1.6.0
+clarabel==0.9.0            # default cvxpy backend for QP
+
+# --- Config & logging ---
+python-dotenv==1.0.1
+structlog==24.4.0           # structured audit logging for SDAIA/PDPL compliance
