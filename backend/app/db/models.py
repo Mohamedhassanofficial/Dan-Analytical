@@ -218,6 +218,11 @@ class Stock(Base, TimestampMixin):
     last_price: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
     last_price_date: Mapped[date | None] = mapped_column(Date)
     last_analytics_refresh: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Fundamental disclosure dates (shown in the Screener's Financial Ratios
+    # band — Loay slide). Patchy per issuer, so all nullable.
+    last_balance_sheet_date: Mapped[date | None] = mapped_column(Date)
+    last_income_statement_date: Mapped[date | None] = mapped_column(Date)
+    latest_dividend_date: Mapped[date | None] = mapped_column(Date)
 
     sector: Mapped[Sector | None] = relationship(back_populates="stocks")
     prices: Mapped[list["PriceDaily"]] = relationship(

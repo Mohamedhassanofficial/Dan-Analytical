@@ -38,6 +38,26 @@ export interface StockRow {
   last_price: number | null;
   last_price_date: string | null;
   last_analytics_refresh: string | null;
+
+  // Disclosure dates (Loay slide — Financial Ratios band)
+  last_balance_sheet_date: string | null;
+  last_income_statement_date: string | null;
+  latest_dividend_date: string | null;
+}
+
+// Data sources & update periods footer (Loay slide — مصادر البيانات وفترات التحديث)
+export interface DataSourceRange {
+  id: string;
+  date_from: string | null;
+  date_to: string | null;
+  source_name: string;
+  source_url: string | null;
+}
+
+export interface DataSourcesPayload {
+  stock_prices: DataSourceRange;
+  sector_indices: DataSourceRange;
+  last_update: DataSourceRange;
 }
 
 // Sector-level summary + averages (Loay slide 83)
@@ -77,4 +97,5 @@ export const StocksAPI = {
   sectorsSummary: () => api<SectorSummary[]>("/stocks/sectors-summary"),
   sectorAverages: (sectorCode: string) =>
     api<SectorAverages>(`/stocks/sector-averages?sector_code=${encodeURIComponent(sectorCode)}`),
+  dataSources: () => api<DataSourcesPayload>("/stocks/data-sources"),
 };

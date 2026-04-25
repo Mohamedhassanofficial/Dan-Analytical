@@ -14,8 +14,14 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.api.deps import CurrentUserDep, DbDep
-from app.db.models import Sector, Stock
-from app.schemas.stocks import SectorAveragesOut, SectorSummary, StockRow
+from app.db.models import PriceDaily, Sector, SectorIndexDaily, Stock
+from app.schemas.stocks import (
+    DataSourceRange,
+    DataSourcesOut,
+    SectorAveragesOut,
+    SectorSummary,
+    StockRow,
+)
 from app.services.sector_analytics import compute_sector_averages
 
 router = APIRouter(prefix="/stocks", tags=["stocks"])
@@ -65,9 +71,52 @@ def list_stocks(db: DbDep, _: CurrentUserDep) -> list[StockRow]:
             last_price=_d(s.last_price),
             last_price_date=s.last_price_date,
             last_analytics_refresh=s.last_analytics_refresh,
+            # Disclosure dates
+            last_balance_sheet_date=s.last_balance_sheet_date,
+            last_income_statement_date=s.last_income_statement_date,
+            latest_dividend_date=s.latest_dividend_date,
         )
         for s in rows
     ]
+
+
+# ---------------------------------------------------------------------------
+# Data sources & update periods footer (Loay slide — مصادر البيانات وفترات التحديث)
+# ---------------------------------------------------------------------------
+@router.get("/data-sources", response_model=DataSourcesOut)
+def data_sources(db: DbDep, _: CurrentUserDep) -> DataSourcesOut:
+    """
+    Return the three date ranges + provider labels shown in the Screener's
+    data-sources footer. Ranges are computed live from the data tables so
+    they stay accurate after each refresh.
+    """
+    px_min, px_max = db.execute(
+        select(func.min(PriceDaily.trade_date), func.max(PriceDaily.trade_date))
+    ).one()
+    sx_min, sx_max = db.execute(
+        select(func.min(SectorIndexDaily.trade_date), func.max(SectorIndexDaily.trade_date))
+    ).one()
+    # "Last update" card shows only the most recent price date.
+    return DataSourcesOut(
+        stock_prices=DataSourceRange(
+            id="stock_prices",
+            date_from=px_min, date_to=px_max,
+            source_name="Yahoo Finance",
+            source_url="https://finance.yahoo.com",
+        ),
+        sector_indices=DataSourceRange(
+            id="sector_indices",
+            date_from=sx_min, date_to=sx_max,
+            source_name="Mubasher DirectFin",
+            source_url="https://www.mubasher.info",
+        ),
+        last_update=DataSourceRange(
+            id="last_update",
+            date_from=px_max, date_to=px_max,
+            source_name="Yahoo Finance",
+            source_url="https://finance.yahoo.com",
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------

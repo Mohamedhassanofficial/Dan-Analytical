@@ -105,3 +105,21 @@ export function useLabel(): (key: string, vars?: Record<string, string | number>
     [labels, locale, t],
   );
 }
+
+/**
+ * Long bilingual description for a label key (admin-editable). Returns null
+ * when the description is missing, so callers can render the (i) icon
+ * conditionally.
+ */
+export function useLabelDescription(): (key: string) => string | null {
+  const { labels } = useLabelsContext();
+  const { locale } = useLocale();
+  return useCallback(
+    (key: string) => {
+      const l = labels[key];
+      if (!l) return null;
+      return (locale === "ar" ? l.description_ar : l.description_en) ?? null;
+    },
+    [labels, locale],
+  );
+}

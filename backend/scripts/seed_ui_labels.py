@@ -15,6 +15,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -137,6 +138,18 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
     ("screener.portfolio_context_count", "{{n}} أسهم في المحفظة",            "{{n}} stocks in portfolio",    "screener", "Keep {{n}} placeholder."),
     ("screener.portfolio_context_back",  "العودة لتفاصيل المحفظة",            "Back to portfolio details",    "screener", None),
 
+    # ── Screener Add modal (Loay slide #7) ──────────────────────────────
+    ("screener.add_modal_title",         "إضافة سهم إلى المحفظة",             "Add stock to portfolio",       "screener", None),
+    ("screener.add_modal_stock",         "السهم",                             "Stock",                        "screener", None),
+    ("screener.add_modal_portfolio",     "المحفظة",                           "Portfolio",                    "screener", None),
+    ("screener.add_modal_holdings",      "{{n}} أسهم · {{amount}}",           "{{n}} stocks · {{amount}}",    "screener", "Keep {{n}} and {{amount}} placeholders."),
+    ("screener.add_modal_weight_notice", "سيتم تصفير أوزان المحفظة بعد الإضافة. يجب إعادة احتساب الأوزان من شاشة تفاصيل المحفظة.",
+                                         "Portfolio weights will reset to zero after adding. Recompute the weights from the portfolio details screen.",
+                                                                              "screener", None),
+    ("screener.add_modal_confirm",       "تأكيد الإضافة",                     "Confirm Add",                  "screener", None),
+    ("screener.add_modal_cancel",        "إلغاء",                             "Cancel",                       "screener", None),
+    ("screener.add_modal_added",         "تمت إضافة {{ticker}} إلى المحفظة",  "Added {{ticker}} to portfolio", "screener", "Keep {{ticker}} placeholder."),
+
     # ── Portfolio Details (slide #19) ──────────────────────────────────
     ("details.breadcrumb",        "تفاصيل المحفظة واحتساب الأوزان",         "Portfolio details & weight computation", "details", None),
     ("details.add_stocks",        "إضافة أسهم",                             "Add stocks",                    "details", None),
@@ -163,6 +176,98 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
     ("sector_avg.btn_risk",     "متوسطات مؤشرات المخاطر",             "Risk Indicator Averages",      "sector_avg", None),
     ("sector_avg.btn_financial","متوسطات المؤشرات المالية",           "Financial Indicator Averages", "sector_avg", None),
     ("sector_avg.refresh",      "تحديث",                              "Refresh",                      "sector_avg", None),
+
+    # ── Disclosure-date columns (Loay slide — Financial Ratios band) ───
+    ("screener.col_balance_sheet_date",
+                                  "آخر تحديث للميزانية العمومية",
+                                  "Last Updated Balance Sheet",         "screener", None),
+    ("screener.col_income_statement_date",
+                                  "آخر تحديث لقائمة الدخل",
+                                  "Last Updated Income Statement",      "screener", None),
+    ("screener.col_dividend_date",
+                                  "تاريخ آخر توزيع نقدي",
+                                  "Latest Dividend Date",               "screener", None),
+
+    # ── Data sources & update periods footer ───────────────────────────
+    ("data_sources.title",
+                                  "مصادر البيانات وفترات التحديث",
+                                  "Data Sources & Update Periods",      "screener", None),
+    ("data_sources.card_stock_prices_title",
+                                  "تاريخ تحديث أسعار الأسهم التاريخية على مدى ثلاث سنوات",
+                                  "Historical stock prices — last 3 years",
+                                                                        "screener", None),
+    ("data_sources.card_sector_indices_title",
+                                  "تاريخ تحديث أسعار مؤشرات القطاعات لأسهم تداول على مدى عشر سنوات",
+                                  "Sector index prices (Tadawul) — last 10 years",
+                                                                        "screener", None),
+    ("data_sources.card_last_update_title",
+                                  "آخر تاريخ لتحديث أسعار الأسهم",
+                                  "Most recent stock price update",     "screener", None),
+    ("data_sources.from_to",      "من {{from}} إلى {{to}}",            "From {{from}} To {{to}}",      "screener", "Keep {{from}} and {{to}} placeholders."),
+    ("data_sources.data_source_label", "مصدر البيانات",                "Data Source",                  "screener", None),
+]
+
+
+# Long bilingual descriptions for the 14 indicator column headers — surfaced
+# as (i) tooltips next to each column. Backfilled separately because they
+# weren't part of the original LABELS tuple (which only carries description_en).
+# Idempotent: the seed code below only fills NULL columns, so admin edits stay.
+INDICATOR_DESCRIPTIONS: list[tuple[str, str, str]] = [
+    # (key, description_ar, description_en)
+    ("screener.col_beta",
+     "حساسية السهم لتقلبات السوق — قيمة 1.0 تعني تذبذبًا مساويًا للسوق، أعلى من 1 أكثر تذبذبًا.",
+     "Sensitivity of the stock's returns to market movements — 1.0 means the stock moves in line with the market."),
+    ("screener.col_capm_return",
+     "العائد المتوقع وفق نموذج CAPM = العائد الخالي من المخاطر + بيتا × علاوة مخاطر السوق.",
+     "Expected return from the CAPM model: risk-free rate + beta × market risk premium."),
+    ("screener.col_daily_vol",
+     "الانحراف المعياري للعوائد اليومية — مقياس للتذبذب على المدى القصير.",
+     "Standard deviation of daily returns — short-term volatility."),
+    ("screener.col_annual_vol",
+     "التذبذب السنوي = التذبذب اليومي × جذر 252 — المدخل الأساسي لتصنيف المخاطر.",
+     "Daily volatility × √252 — drives the Risk Ranking categorisation."),
+    ("screener.col_sharp",
+     "(العائد − معدل خالي المخاطر) ÷ التذبذب — يقيس كفاءة العائد مقابل المخاطرة.",
+     "(Return − risk-free rate) / volatility — measures return per unit of risk."),
+    ("screener.col_var_1d",
+     "أقصى خسارة متوقعة في يوم واحد عند مستوى ثقة 95% (Value at Risk).",
+     "Worst expected loss over a single day at 95% confidence (Value at Risk)."),
+    ("screener.col_risk_rank",
+     "تصنيف كمي للمخاطر مشتق من التذبذب السنوي وفق عتبات شريحة 105: متحفظ / متحفظ معتدل / جريء / جريء جداً.",
+     "Risk category derived from annual volatility per slide-105 thresholds: Conservative, Moderately Conservative, Aggressive, Very Aggressive."),
+    ("screener.col_pe",
+     "السعر ÷ ربحية السهم — ما يدفعه المستثمر مقابل ريال واحد من الأرباح.",
+     "Price ÷ earnings per share — what an investor pays per riyal of earnings."),
+    ("screener.col_mb",
+     "السعر السوقي ÷ القيمة الدفترية للسهم — المضاعف على صافي حقوق المساهمين.",
+     "Market price ÷ book value per share — the multiple on shareholder equity."),
+    ("screener.col_roe",
+     "صافي الربح ÷ حقوق المساهمين — كفاءة الإدارة في توليد الأرباح من رأس المال.",
+     "Net income ÷ shareholder equity — how efficiently management converts equity to profit."),
+    ("screener.col_fcf",
+     "التدفق النقدي الحر ÷ القيمة السوقية — مقياس لجودة الأرباح النقدية.",
+     "Free cash flow ÷ market cap — quality of cash earnings."),
+    ("screener.col_leverage",
+     "إجمالي الديون ÷ حقوق المساهمين — مستوى اعتماد الشركة على الدين في تمويل عملياتها.",
+     "Total debt ÷ shareholder equity — how much the company relies on debt financing."),
+    ("screener.col_eps",
+     "صافي الربح ÷ عدد الأسهم — حصة السهم الواحد من الأرباح.",
+     "Net income ÷ shares outstanding — earnings per share."),
+    ("screener.col_div_yield",
+     "التوزيع السنوي ÷ السعر — العائد النقدي السنوي للمساهم.",
+     "Annual dividend ÷ price — the annual cash yield to shareholders."),
+    ("screener.col_div_rate",
+     "إجمالي التوزيع النقدي السنوي للسهم الواحد بالريال.",
+     "Total annual dividend paid per share, in SAR."),
+    ("screener.col_balance_sheet_date",
+     "تاريخ آخر ميزانية عمومية أفصحت عنها الشركة.",
+     "Date of the most recently disclosed balance sheet."),
+    ("screener.col_income_statement_date",
+     "تاريخ آخر قائمة دخل أفصحت عنها الشركة.",
+     "Date of the most recently disclosed income statement."),
+    ("screener.col_dividend_date",
+     "تاريخ آخر توزيع نقدي تمت الموافقة عليه (يكون قبل تاريخ الاستحقاق).",
+     "Date of the most recently approved cash dividend."),
 ]
 
 
@@ -178,6 +283,24 @@ def seed() -> int:
             ).on_conflict_do_nothing(index_elements=["key"])
             # on_conflict_do_nothing → admin edits are preserved across re-runs.
             db.execute(stmt)
+
+        # Backfill long descriptions for indicator columns. Only writes when
+        # the field is currently NULL — admin overrides are preserved.
+        for key, desc_ar, desc_en in INDICATOR_DESCRIPTIONS:
+            db.execute(
+                text(
+                    "UPDATE ui_labels SET description_ar = :v "
+                    "WHERE key = :k AND description_ar IS NULL"
+                ),
+                {"v": desc_ar, "k": key},
+            )
+            db.execute(
+                text(
+                    "UPDATE ui_labels SET description_en = :v "
+                    "WHERE key = :k AND description_en IS NULL"
+                ),
+                {"v": desc_en, "k": key},
+            )
         db.commit()
     return len(LABELS)
 

@@ -46,7 +46,29 @@ class StockRow(BaseModel):
     last_price_date: date | None
     last_analytics_refresh: datetime | None
 
+    # Fundamental disclosure dates (rendered in the Screener's Financial
+    # Ratios band). None → "—" on the frontend.
+    last_balance_sheet_date: date | None
+    last_income_statement_date: date | None
+    latest_dividend_date: date | None
+
     model_config = {"from_attributes": True}
+
+
+class DataSourceRange(BaseModel):
+    """Date range + provider info for one data-sources footer card."""
+    id: str
+    date_from: date | None
+    date_to: date | None
+    source_name: str
+    source_url: str | None
+
+
+class DataSourcesOut(BaseModel):
+    """Payload for the Screener's "مصادر البيانات وفترات التحديث" footer."""
+    stock_prices: DataSourceRange
+    sector_indices: DataSourceRange
+    last_update: DataSourceRange
 
 
 class SectorAveragesOut(BaseModel):

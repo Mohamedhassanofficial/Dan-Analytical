@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, BarChart3, Check, Filter, Plus, Search, Shield, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, BarChart3, Check, CheckCircle2, Filter, Plus, Search, Shield, X } from "lucide-react";
 import { StocksAPI, type StockRow } from "@/api/stocks";
 import { PortfolioAPI, type SavedPortfolio } from "@/api/portfolio";
 import { ApiError } from "@/api/client";
+import DataSourcesFooter from "@/components/DataSourcesFooter";
+import HeaderInfo from "@/components/HeaderInfo";
 import IndicatorFilterModal, {
   type FilterableColumn,
   type OpFilter,
@@ -52,6 +54,14 @@ const RISK_COLS: NumericCol[] = [
   { key: "annual_volatility", labelKey: "screener.col_annual_vol",  fmt: "pct" },
   { key: "sharp_ratio",       labelKey: "screener.col_sharp",       fmt: "num", digits: 3 },
   { key: "var_95_daily",      labelKey: "screener.col_var_1d",      fmt: "pct" },
+];
+
+// Disclosure-date columns — rendered after the financial group, before
+// the sticky Actions cell. Loay's mockup labels them under "Financial Ratios".
+const DISCLOSURE_DATE_COLS: { key: keyof StockRow; labelKey: string }[] = [
+  { key: "last_balance_sheet_date",    labelKey: "screener.col_balance_sheet_date" },
+  { key: "last_income_statement_date", labelKey: "screener.col_income_statement_date" },
+  { key: "latest_dividend_date",       labelKey: "screener.col_dividend_date" },
 ];
 
 const FINANCIAL_COLS: NumericCol[] = [
@@ -157,6 +167,12 @@ export default function ScreenerPage() {
   const [portfolio, setPortfolio] = useState<SavedPortfolio | null>(null);
   const [addingTicker, setAddingTicker] = useState<string | null>(null);
 
+  // Slide #7 Add modal — opens when the user clicks Add on a row in
+  // portfolio-context mode. Stores the row being added so the modal can
+  // render its details. `addedTicker` drives the post-confirm success toast.
+  const [addPending, setAddPending] = useState<StockRow | null>(null);
+  const [addedTicker, setAddedTicker] = useState<string | null>(null);
+
   useEffect(() => {
     StocksAPI.list()
       .then(setRows)
@@ -255,6 +271,45 @@ export default function ScreenerPage() {
       setAddingTicker(null);
     }
   }
+
+  // Add button click — three branches:
+  //   - standalone (no ?portfolio=): toggle the localStorage draft, no modal
+  //   - portfolio-context, row already in portfolio: direct remove (no modal)
+  //   - portfolio-context, row not yet in portfolio: open slide-#7 modal
+  function onAddClick(row: StockRow) {
+    if (portfolioIdNum === null) {
+      toggleDraft(row.symbol);
+      return;
+    }
+    if (inPortfolio.has(row.ticker_suffix)) {
+      void togglePortfolioHolding(row);
+      return;
+    }
+    setAddPending(row);
+  }
+
+  async function confirmAdd() {
+    if (!addPending || portfolioIdNum === null) return;
+    const ticker = addPending.ticker_suffix;
+    setAddingTicker(ticker);
+    try {
+      const updated = await PortfolioAPI.addHolding(portfolioIdNum, ticker);
+      setPortfolio(updated);
+      setAddedTicker(ticker);
+      setAddPending(null);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.detail : t("errors.network"));
+    } finally {
+      setAddingTicker(null);
+    }
+  }
+
+  // Auto-clear the success toast after 3s.
+  useEffect(() => {
+    if (!addedTicker) return;
+    const id = setTimeout(() => setAddedTicker(null), 3000);
+    return () => clearTimeout(id);
+  }, [addedTicker]);
 
   const displayName = (r: StockRow) =>
     locale === "ar"
@@ -360,6 +415,14 @@ export default function ScreenerPage() {
       {/* Sector averages panel — Loay slide #83 */}
       <SectorAveragesPanel />
 
+      {/* Success banner after Add modal confirms (auto-dismisses after 3s) */}
+      {addedTicker && (
+        <div className="badge-ok flex items-center gap-2 w-fit">
+          <CheckCircle2 size={14} />
+          {label("screener.add_modal_added", { ticker: addedTicker })}
+        </div>
+      )}
+
       {/* Draft portfolio summary */}
       {draft.length > 0 && (
         <div className="card flex items-center justify-between border-brand-300 bg-brand-50 p-3">
@@ -378,16 +441,43 @@ export default function ScreenerPage() {
       {/* Table */}
       <div className="card p-0 overflow-hidden">
         <div className="relative max-h-[75vh] overflow-auto">
-          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + 4)}px` }}>
+          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 4)}px` }}>
             <thead>
               <tr>
                 <ThSticky colIndex={0}>{label("screener.col_symbol")}</ThSticky>
                 <ThSticky colIndex={1}>{label("screener.col_name")}</ThSticky>
                 <Th>{label("screener.col_sector")}</Th>
                 <Th>{label("screener.col_industry")}</Th>
-                {RISK_COLS.map((c) => <Th key={c.key as string}>{label(c.labelKey)}</Th>)}
-                <Th>{label("screener.col_risk_rank")}</Th>
-                {FINANCIAL_COLS.map((c) => <Th key={c.key as string}>{label(c.labelKey)}</Th>)}
+                {RISK_COLS.map((c) => (
+                  <Th key={c.key as string}>
+                    <span className="inline-flex items-center gap-1.5">
+                      {label(c.labelKey)}
+                      <HeaderInfo labelKey={c.labelKey} />
+                    </span>
+                  </Th>
+                ))}
+                <Th>
+                  <span className="inline-flex items-center gap-1.5">
+                    {label("screener.col_risk_rank")}
+                    <HeaderInfo labelKey="screener.col_risk_rank" />
+                  </span>
+                </Th>
+                {FINANCIAL_COLS.map((c) => (
+                  <Th key={c.key as string}>
+                    <span className="inline-flex items-center gap-1.5">
+                      {label(c.labelKey)}
+                      <HeaderInfo labelKey={c.labelKey} />
+                    </span>
+                  </Th>
+                ))}
+                {DISCLOSURE_DATE_COLS.map((c) => (
+                  <Th key={c.key}>
+                    <span className="inline-flex items-center gap-1.5">
+                      {label(c.labelKey)}
+                      <HeaderInfo labelKey={c.labelKey} />
+                    </span>
+                  </Th>
+                ))}
                 <ThSticky colIndex={0} end>{label("screener.col_actions")}</ThSticky>
               </tr>
             </thead>
@@ -446,16 +536,25 @@ export default function ScreenerPage() {
                       );
                     })}
 
+                    {/* Disclosure dates */}
+                    {DISCLOSURE_DATE_COLS.map((c) => {
+                      const v = r[c.key] as string | null;
+                      return (
+                        <td
+                          key={c.key}
+                          className={`screener-cell text-right tabular-nums ${v ? "text-ink" : "text-muted"}`}
+                        >
+                          {v ?? "N/A"}
+                        </td>
+                      );
+                    })}
+
                     {/* Actions */}
                     <TdSticky colIndex={0} end>
                       <div className="flex items-center justify-end gap-2">
                         <button
                           className={isAdded ? "btn-secondary h-8 px-2 py-0" : "btn-primary h-8 px-2 py-0"}
-                          onClick={() =>
-                            portfolioIdNum !== null
-                              ? togglePortfolioHolding(r)
-                              : toggleDraft(r.symbol)
-                          }
+                          onClick={() => onAddClick(r)}
                           disabled={addingTicker === r.ticker_suffix}
                           title={isAdded ? label("screener.remove") : label("screener.add_to_portfolio")}
                         >
@@ -481,7 +580,7 @@ export default function ScreenerPage() {
               {rows !== null && filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={RISK_COLS.length + FINANCIAL_COLS.length + 4}
+                    colSpan={RISK_COLS.length + FINANCIAL_COLS.length + DISCLOSURE_DATE_COLS.length + 4}
                     className="py-10 text-center text-muted"
                   >
                     {label("screener.empty")}
@@ -492,6 +591,9 @@ export default function ScreenerPage() {
           </table>
         </div>
       </div>
+
+      {/* Data sources & update periods footer (Loay slide) */}
+      <DataSourcesFooter />
 
       {/* Filter modals */}
       <IndicatorFilterModal
@@ -510,6 +612,121 @@ export default function ScreenerPage() {
         onApply={setFinancialFilters}
         onClose={() => setFinancialModalOpen(false)}
       />
+
+      {/* Slide-#7 Add modal */}
+      {addPending && portfolio && (
+        <AddToPortfolioModal
+          row={addPending}
+          portfolio={portfolio}
+          stockName={displayName(addPending)}
+          submitting={addingTicker === addPending.ticker_suffix}
+          onConfirm={() => void confirmAdd()}
+          onClose={() => setAddPending(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Slide-#7 "Add to portfolio" modal                                          */
+/* ────────────────────────────────────────────────────────────────────────── */
+interface AddModalProps {
+  row: StockRow;
+  portfolio: SavedPortfolio;
+  stockName: string;
+  submitting: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+}
+
+function AddToPortfolioModal({
+  row, portfolio, stockName, submitting, onConfirm, onClose,
+}: AddModalProps) {
+  const { t } = useTranslation();
+  const label = useLabel();
+  const { locale } = useLocale();
+
+  const moneyFmt = useMemo(
+    () =>
+      new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-GB", {
+        style: "currency",
+        currency: "SAR",
+        maximumFractionDigits: 0,
+      }),
+    [locale],
+  );
+  const amountText = portfolio.initial_capital
+    ? moneyFmt.format(portfolio.initial_capital)
+    : "—";
+
+  return (
+    <div
+      className="fixed inset-0 z-40 flex items-center justify-center bg-brand-900/40 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-xl bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-brand-100 px-5 py-4">
+          <h2 className="text-lg font-semibold text-brand-900">
+            {label("screener.add_modal_title")}
+          </h2>
+          <button onClick={onClose} className="btn-ghost p-1" aria-label="close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-4 px-5 py-4 text-sm">
+          <div className="rounded-lg border border-brand-200 bg-brand-50 p-3">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted">
+              {label("screener.add_modal_stock")}
+            </div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="font-mono text-base font-semibold text-brand-900">
+                {row.ticker_suffix}
+              </span>
+              <span className="text-brand-900">— {stockName}</span>
+            </div>
+            {row.sector_code && (
+              <div className="mt-1 text-xs text-muted">{row.sector_code}</div>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-brand-200 bg-brand-50 p-3">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted">
+              {label("screener.add_modal_portfolio")}
+            </div>
+            <div className="mt-1 font-semibold text-brand-900">{portfolio.name}</div>
+            <div className="mt-1 text-xs text-muted">
+              {label("screener.add_modal_holdings", {
+                n: portfolio.holding_count,
+                amount: amountText,
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2 rounded-lg border border-brand-300 bg-brand-100 p-3 text-xs text-brand-900">
+            <AlertTriangle size={16} className="mt-0.5 flex-none text-brand-700" />
+            <span>{label("screener.add_modal_weight_notice")}</span>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 border-t border-brand-100 px-5 py-3">
+          <button type="button" className="btn-ghost" onClick={onClose}>
+            {label("screener.add_modal_cancel")}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={onConfirm}
+            disabled={submitting}
+          >
+            {submitting ? t("common.loading") : label("screener.add_modal_confirm")}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

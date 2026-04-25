@@ -218,6 +218,35 @@ def seed() -> int:
             s.risk_ranking = compute_risk_ranking(s.annual_volatility)
             s.last_analytics_refresh = now
 
+            # Disclosure dates — most issuers report quarterly. Pick a recent
+            # quarter-end for balance sheet / income statement; a smaller set
+            # disclose nothing (kept null). Dividend dates spread wider since
+            # not every issuer pays.
+            quarter_ends = (
+                date(2025, 9, 30), date(2025, 6, 30), date(2025, 3, 31),
+                date(2024, 12, 31), date(2024, 9, 30), date(2024, 6, 30),
+                date(2024, 3, 31),
+            )
+            if rng.random() < 0.06:
+                s.last_balance_sheet_date = None
+                s.last_income_statement_date = None
+            else:
+                bs = quarter_ends[int(rng.integers(0, len(quarter_ends)))]
+                # Income statement usually matches; occasionally one quarter behind
+                idx = quarter_ends.index(bs)
+                inc_idx = min(idx + (1 if rng.random() < 0.08 else 0), len(quarter_ends) - 1)
+                s.last_balance_sheet_date = bs
+                s.last_income_statement_date = quarter_ends[inc_idx]
+            if rng.random() < 0.18:
+                s.latest_dividend_date = None
+            else:
+                # Dividend dates spread across 2014..2026 — some issuers haven't
+                # paid in years (e.g. SARCO). Bias toward recent.
+                year = int(rng.choice([2026, 2025, 2025, 2025, 2024, 2024, 2023, 2018, 2014]))
+                month = int(rng.integers(1, 13))
+                day = int(rng.integers(1, 28))
+                s.latest_dividend_date = date(year, month, day)
+
             updated += 1
 
         db.commit()

@@ -7,6 +7,7 @@ import {
   type SectorSummary,
 } from "@/api/stocks";
 import { ApiError } from "@/api/client";
+import HeaderInfo from "@/components/HeaderInfo";
 import { useLabel } from "@/contexts/LabelsContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { fmtNum, fmtPct } from "@/lib/format";
@@ -185,13 +186,13 @@ export default function SectorAveragesPanel() {
 
           {group === "risk" && (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              <Card label={label("screener.col_var_1d")} value={averages.avg_var_95_daily} fmt="pct" />
-              <Card label={label("screener.col_sharp")} value={averages.avg_sharp_ratio} fmt="num" />
-              <Card label={label("screener.col_beta")} value={averages.avg_beta} fmt="num" />
-              <Card label={label("screener.col_daily_vol")} value={averages.avg_daily_volatility} fmt="pct" />
-              <Card label={label("screener.col_annual_vol")} value={averages.avg_annual_volatility} fmt="pct" />
+              <Card labelKey="screener.col_var_1d" value={averages.avg_var_95_daily} fmt="pct" />
+              <Card labelKey="screener.col_sharp" value={averages.avg_sharp_ratio} fmt="num" />
+              <Card labelKey="screener.col_beta" value={averages.avg_beta} fmt="num" />
+              <Card labelKey="screener.col_daily_vol" value={averages.avg_daily_volatility} fmt="pct" />
+              <Card labelKey="screener.col_annual_vol" value={averages.avg_annual_volatility} fmt="pct" />
               <RankingCard
-                label={label("screener.col_risk_rank")}
+                labelKey="screener.col_risk_rank"
                 ranking={averages.risk_ranking}
                 rankingLabel={
                   averages.risk_ranking
@@ -204,14 +205,14 @@ export default function SectorAveragesPanel() {
 
           {group === "financial" && (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-              <Card label={label("screener.col_pe")} value={averages.avg_pe_ratio} fmt="num" digits={2} />
-              <Card label={label("screener.col_roe")} value={averages.avg_roe} fmt="pct" />
-              <Card label={label("screener.col_leverage")} value={averages.avg_leverage_ratio} fmt="num" digits={2} />
-              <Card label={label("screener.col_fcf")} value={averages.avg_fcf_yield} fmt="pct" />
-              <Card label={label("screener.col_mb")} value={averages.avg_market_to_book} fmt="num" digits={2} />
-              <Card label={label("screener.col_eps")} value={averages.avg_eps} fmt="num" digits={2} />
-              <Card label={label("screener.col_div_yield")} value={averages.avg_dividend_yield} fmt="pct" />
-              <Card label={label("screener.col_div_rate")} value={averages.avg_annual_dividend_rate} fmt="num" digits={2} />
+              <Card labelKey="screener.col_pe" value={averages.avg_pe_ratio} fmt="num" digits={2} />
+              <Card labelKey="screener.col_roe" value={averages.avg_roe} fmt="pct" />
+              <Card labelKey="screener.col_leverage" value={averages.avg_leverage_ratio} fmt="num" digits={2} />
+              <Card labelKey="screener.col_fcf" value={averages.avg_fcf_yield} fmt="pct" />
+              <Card labelKey="screener.col_mb" value={averages.avg_market_to_book} fmt="num" digits={2} />
+              <Card labelKey="screener.col_eps" value={averages.avg_eps} fmt="num" digits={2} />
+              <Card labelKey="screener.col_div_yield" value={averages.avg_dividend_yield} fmt="pct" />
+              <Card labelKey="screener.col_div_rate" value={averages.avg_annual_dividend_rate} fmt="num" digits={2} />
             </div>
           )}
         </>
@@ -221,16 +222,17 @@ export default function SectorAveragesPanel() {
 }
 
 function Card({
-  label,
+  labelKey,
   value,
   fmt,
   digits,
 }: {
-  label: string;
+  labelKey: string;
   value: number | null;
   fmt: "num" | "pct";
   digits?: number;
 }) {
+  const label = useLabel();
   const display =
     value === null
       ? "—"
@@ -239,7 +241,10 @@ function Card({
         : fmtNum(value, digits ?? 3);
   return (
     <div className="rounded-lg border border-brand-200 bg-brand-50 p-3 text-center">
-      <div className="text-xs font-medium text-brand-800">{label}</div>
+      <div className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-brand-800">
+        {label(labelKey)}
+        <HeaderInfo labelKey={labelKey} />
+      </div>
       <div className={`mt-1 text-lg font-semibold tabular-nums ${tone(value)}`}>
         {display}
       </div>
@@ -248,17 +253,21 @@ function Card({
 }
 
 function RankingCard({
-  label,
+  labelKey,
   ranking,
   rankingLabel,
 }: {
-  label: string;
+  labelKey: string;
   ranking: string | null;
   rankingLabel: string;
 }) {
+  const label = useLabel();
   return (
     <div className="rounded-lg border border-brand-200 bg-brand-50 p-3 text-center">
-      <div className="text-xs font-medium text-brand-800">{label}</div>
+      <div className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-brand-800">
+        {label(labelKey)}
+        <HeaderInfo labelKey={labelKey} />
+      </div>
       <div className="mt-2">
         {ranking ? (
           <span className={rankingClass(ranking)}>{rankingLabel}</span>
