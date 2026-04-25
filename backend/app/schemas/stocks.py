@@ -47,3 +47,36 @@ class StockRow(BaseModel):
     last_analytics_refresh: datetime | None
 
     model_config = {"from_attributes": True}
+
+
+class SectorAveragesOut(BaseModel):
+    """Sector-level averages of the 14 indicators (Loay's slide 83)."""
+    sector_code: str
+    sector_name_ar: str
+    sector_name_en: str
+    stock_count: int
+    # Risk
+    avg_beta: float | None
+    avg_capm_expected_return: float | None
+    avg_daily_volatility: float | None
+    avg_annual_volatility: float | None
+    avg_sharp_ratio: float | None
+    avg_var_95_daily: float | None
+    risk_ranking: str | None
+    # Financial
+    avg_pe_ratio: float | None
+    avg_market_to_book: float | None
+    avg_roe: float | None
+    avg_fcf_yield: float | None
+    avg_leverage_ratio: float | None
+    avg_eps: float | None
+    avg_dividend_yield: float | None
+    avg_annual_dividend_rate: float | None
+
+
+class SectorSummary(BaseModel):
+    """Lightweight: code + name + stock count, populates the sector picker."""
+    sector_code: str
+    sector_name_ar: str
+    sector_name_en: str
+    stock_count: int

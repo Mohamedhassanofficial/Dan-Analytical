@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { BarChart3, Check, Filter, Plus, Search, Shield, X } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, BarChart3, Check, Filter, Plus, Search, Shield, X } from "lucide-react";
 import { StocksAPI, type StockRow } from "@/api/stocks";
+import { PortfolioAPI, type SavedPortfolio } from "@/api/portfolio";
 import { ApiError } from "@/api/client";
 import IndicatorFilterModal, {
   type FilterableColumn,
   type OpFilter,
 } from "@/components/IndicatorFilterModal";
+import SectorAveragesPanel from "@/components/SectorAveragesPanel";
 import { useLabel } from "@/contexts/LabelsContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { fmtNum, fmtPct } from "@/lib/format";
@@ -70,9 +73,11 @@ const FINANCIAL_FILTER_COLS: FilterableColumn[] = FINANCIAL_COLS.map((c) => ({
 }));
 
 // ── Numeric cell tone rule (accountant-style) ───────────────────────────────
+// Per PPTX slide 91: positive = black ink, zero or negative = red text on
+// a light-pink surface so the cell visually flags itself.
 function numToneClass(v: number | null | undefined): string {
   if (v === null || v === undefined) return "text-muted";
-  return v > 0 ? "text-ink" : "text-danger font-semibold";
+  return v > 0 ? "text-ink" : "cell-negative";
 }
 
 function formatCell(v: number | null | undefined, col: NumericCol): string {
@@ -82,13 +87,16 @@ function formatCell(v: number | null | undefined, col: NumericCol): string {
   return fmtNum(v, col.digits ?? 3);
 }
 
-// ── Risk Ranking badge (4-level, blue + one red for Very Aggressive) ────────
+// ── Risk Ranking badge (Excel-spec colors per slide 91) ─────────────────────
+// "مسمى درجة المخاطر وكذلك تضليل مخاطر الألوان يجب أن تكون نفس ما هو مذكور في
+// ملف اكسل" — green / yellow / orange / red. Sanctioned exception to the
+// otherwise blue-only theme.
 function rankingBadgeClass(rank: string | null | undefined): string {
   switch (rank) {
-    case "Conservative":             return "badge bg-brand-100 text-brand-800";
-    case "Moderately Conservative":  return "badge bg-brand-200 text-brand-900";
-    case "Aggressive":               return "badge bg-brand-900 text-white";
-    case "Very Aggressive":          return "badge bg-danger text-white";
+    case "Conservative":             return "badge-risk-conservative";
+    case "Moderately Conservative":  return "badge-risk-moderate";
+    case "Aggressive":               return "badge-risk-aggressive";
+    case "Very Aggressive":          return "badge-risk-very-aggressive";
     default:                         return "text-muted";
   }
 }
@@ -125,6 +133,11 @@ export default function ScreenerPage() {
   const label = useLabel();
   const { locale } = useLocale();
 
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const portfolioId = searchParams.get("portfolio");
+  const portfolioIdNum = portfolioId ? Number(portfolioId) : null;
+
   const [rows, setRows] = useState<StockRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -138,6 +151,12 @@ export default function ScreenerPage() {
 
   const [draft, setDraft] = useState<string[]>(() => readDraft());
 
+  // Portfolio-context mode (URL ?portfolio=<id>): fetch the portfolio so we
+  // can show its name in the banner and use its current holdings as the
+  // "already added" source of truth (instead of the localStorage draft).
+  const [portfolio, setPortfolio] = useState<SavedPortfolio | null>(null);
+  const [addingTicker, setAddingTicker] = useState<string | null>(null);
+
   useEffect(() => {
     StocksAPI.list()
       .then(setRows)
@@ -146,6 +165,26 @@ export default function ScreenerPage() {
         setRows([]);
       });
   }, [t]);
+
+  useEffect(() => {
+    if (portfolioIdNum === null) {
+      setPortfolio(null);
+      return;
+    }
+    PortfolioAPI.getOne(portfolioIdNum)
+      .then(setPortfolio)
+      .catch((e: unknown) => {
+        setError(e instanceof ApiError ? e.detail : t("errors.network"));
+        setPortfolio(null);
+      });
+  }, [portfolioIdNum, t]);
+
+  // Set of tickers currently in the portfolio — so the Add button flips to
+  // Check when that stock is already added via a previous visit.
+  const inPortfolio = useMemo<Set<string>>(() => {
+    if (!portfolio) return new Set();
+    return new Set(portfolio.holdings.map((h) => h.ticker));
+  }, [portfolio]);
 
   const sectors = useMemo(() => {
     if (!rows) return [];
@@ -196,6 +235,27 @@ export default function ScreenerPage() {
     writeDraft(next);
   }
 
+  // Portfolio-context add/remove — talks to the backend directly instead of
+  // the localStorage draft. Keeps the row icon's state synchronised with the
+  // live portfolio.
+  async function togglePortfolioHolding(row: StockRow) {
+    if (portfolioIdNum === null) {
+      toggleDraft(row.symbol);
+      return;
+    }
+    setAddingTicker(row.ticker_suffix);
+    try {
+      const updated = inPortfolio.has(row.ticker_suffix)
+        ? await PortfolioAPI.removeHolding(portfolioIdNum, row.ticker_suffix)
+        : await PortfolioAPI.addHolding(portfolioIdNum, row.ticker_suffix);
+      setPortfolio(updated);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.detail : t("errors.network"));
+    } finally {
+      setAddingTicker(null);
+    }
+  }
+
   const displayName = (r: StockRow) =>
     locale === "ar"
       ? r.name_ar || r.name_en || r.ticker_suffix
@@ -227,6 +287,26 @@ export default function ScreenerPage() {
       </div>
 
       {error && <div className="badge-error w-fit">{error}</div>}
+
+      {/* Portfolio-context banner (shown only when ?portfolio=<id> is set) */}
+      {portfolio && (
+        <div className="card flex flex-wrap items-center justify-between gap-3 border-brand-300 bg-brand-50 p-3">
+          <div className="flex items-center gap-3 text-sm text-brand-900">
+            <span className="badge-info">{label("screener.portfolio_context_label")}</span>
+            <span className="font-semibold">{portfolio.name}</span>
+            <span className="text-muted">
+              · {label("screener.portfolio_context_count", { n: portfolio.holding_count })}
+            </span>
+          </div>
+          <button
+            className="btn-secondary h-8 px-3"
+            onClick={() => navigate(`/portfolios/${portfolio.id}`)}
+          >
+            <ArrowLeft size={14} />
+            {label("screener.portfolio_context_back")}
+          </button>
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="card flex flex-wrap items-center gap-3 p-3">
@@ -277,6 +357,9 @@ export default function ScreenerPage() {
         </button>
       </div>
 
+      {/* Sector averages panel — Loay slide #83 */}
+      <SectorAveragesPanel />
+
       {/* Draft portfolio summary */}
       {draft.length > 0 && (
         <div className="card flex items-center justify-between border-brand-300 bg-brand-50 p-3">
@@ -311,7 +394,9 @@ export default function ScreenerPage() {
 
             <tbody>
               {filtered.map((r) => {
-                const isAdded = draft.includes(r.symbol);
+                const isAdded = portfolioIdNum !== null
+                  ? inPortfolio.has(r.ticker_suffix)
+                  : draft.includes(r.symbol);
                 return (
                   <tr key={r.symbol} className="screener-row-hover border-b border-brand-100">
                     <TdSticky colIndex={0} className="font-mono font-semibold">
@@ -366,7 +451,12 @@ export default function ScreenerPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           className={isAdded ? "btn-secondary h-8 px-2 py-0" : "btn-primary h-8 px-2 py-0"}
-                          onClick={() => toggleDraft(r.symbol)}
+                          onClick={() =>
+                            portfolioIdNum !== null
+                              ? togglePortfolioHolding(r)
+                              : toggleDraft(r.symbol)
+                          }
+                          disabled={addingTicker === r.ticker_suffix}
                           title={isAdded ? label("screener.remove") : label("screener.add_to_portfolio")}
                         >
                           {isAdded ? <Check size={14} /> : <Plus size={14} />}

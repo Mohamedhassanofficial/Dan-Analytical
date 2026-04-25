@@ -91,6 +91,20 @@ DEFAULTS: list[tuple[str, object, str, str, str]] = [
         "إقليم تخزين البيانات (يجب أن يكون داخل المملكة حسب نظام PDPL).",
         "Data residency region (must be within KSA per PDPL).",
     ),
+    (
+        "market_proxy_sector_code",
+        "TASI",
+        "string",
+        "رمز القطاع المستخدم كبديل للسوق في نموذج CAPM (المؤشر العام).",
+        "Sector code used as the market proxy in the CAPM model (TASI = All Share Index).",
+    ),
+    (
+        "default_cov_method",
+        "raw",
+        "string",
+        "طريقة حساب مصفوفة التباين المشترك الافتراضية: raw أو ledoit_wolf.",
+        "Default covariance method: 'raw' (ddof=0, Excel parity) or 'ledoit_wolf' (shrinkage).",
+    ),
 ]
 
 

@@ -224,8 +224,15 @@ def compute_all(
     horizon_days: int = 1,
     n_paths: int = 10_000,
     seed: int | None = 42,
+    include_garch: bool = False,
 ) -> dict[str, VarResult]:
-    """Compute all three VaR methods in one call — ideal for the dashboard."""
+    """
+    Compute VaR using all available methods in one call.
+
+    The first three (historical, parametric, monte_carlo) are always computed.
+    GARCH-t is optional (slower due to MLE fitting + simulation) and requires
+    ≥100 observations.
+    """
     h = historical_var(weights, daily_returns, confidence, horizon_days)
     p = parametric_var(
         weights, daily_returns=daily_returns,
@@ -236,4 +243,58 @@ def compute_all(
         confidence=confidence, horizon_days=horizon_days,
         n_paths=n_paths, seed=seed,
     )
-    return {"historical": h, "parametric": p, "monte_carlo": mc}
+    result = {"historical": h, "parametric": p, "monte_carlo": mc}
+
+    if include_garch:
+        try:
+            from app.services.garch import garch_var
+            gt = garch_var(
+                weights, daily_returns,
+                confidence=confidence, horizon_days=horizon_days,
+                n_paths=n_paths, seed=seed,
+            )
+            result["garch_t"] = gt
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).warning(
+                "GARCH-t VaR failed (falling back to 3 methods): %s", exc
+            )
+
+    return result
+
+
+def compute_frtb_es(
+    weights: np.ndarray,
+    daily_returns: np.ndarray,
+    horizon_days: int = 10,
+    n_paths: int = 50_000,
+    seed: int | None = 42,
+) -> dict:
+    """
+    Basel III FRTB Expected Shortfall at 97.5% confidence.
+
+    Convenience wrapper that returns ES via GARCH-t (preferred) with
+    parametric CVaR fallback.
+    """
+    try:
+        from app.services.garch import frtb_expected_shortfall
+        return frtb_expected_shortfall(
+            weights, daily_returns,
+            horizon_days=horizon_days,
+            n_paths=n_paths, seed=seed,
+        )
+    except Exception:
+        # Fallback to parametric CVaR at 97.5%
+        vr = parametric_var(
+            weights, daily_returns=daily_returns,
+            confidence=0.975, horizon_days=horizon_days,
+        )
+        return {
+            "es_975": float(vr.cvar_loss) if vr.cvar_loss else 0.0,
+            "var_975": float(vr.var_loss),
+            "horizon_days": horizon_days,
+            "confidence": 0.975,
+            "garch_params": None,
+            "n_paths": 0,
+            "fallback": "parametric (arch library unavailable)",
+        }

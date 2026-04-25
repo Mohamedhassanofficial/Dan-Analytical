@@ -13,6 +13,7 @@ import ScreenerPage from "@/pages/Screener";
 import OptimizePage from "@/pages/Optimize";
 import HistoryPage from "@/pages/History";
 import PortfolioListPage from "@/pages/PortfolioList";
+import PortfolioDetailsPage from "@/pages/PortfolioDetails";
 import AdminConfigPage from "@/pages/admin/Config";
 import AdminUploadPage from "@/pages/admin/Upload";
 
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/screener" element={<ScreenerPage />} />
           <Route path="/optimize" element={<OptimizePage />} />
           <Route path="/portfolios" element={<PortfolioListPage />} />
+          <Route path="/portfolios/:id" element={<PortfolioDetailsPage />} />
           <Route path="/history" element={<HistoryPage />} />
         </Route>
       </Route>

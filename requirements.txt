@@ -7,6 +7,9 @@ numpy==2.2.1
 scipy==1.14.1
 pandas==2.2.3
 
+# --- GARCH volatility modelling (Phase 2: GARCH-t VaR) ---
+arch==7.2.0                # Kevin Sheppard's GARCH library (MLE + simulation)
+
 # --- Excel / data ingestion ---
 openpyxl==3.1.5            # .xlsx read/write (stock list, sector upload)
 xlrd==2.0.1                # legacy .xls fallback (Excel uploads from clients)

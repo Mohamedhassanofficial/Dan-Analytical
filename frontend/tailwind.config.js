@@ -47,13 +47,29 @@ export default {
         surface: "#f8fbff",
         card:    "#ffffff",
 
-        // ── Single non-blue accent: financial-signal red ─────────────
-        // The blue-only rule has ONE carved-out exception: the
-        // accountant-style negative-number signal. Any numeric indicator
-        // that is <= 0 renders in this red so the user's eye catches it
-        // instantly. Do NOT reuse this token for errors, warnings, or any
-        // other non-financial UI. Errors still use `bg-brand-900 text-white`.
+        // ── Financial signal accents ─────────────────────────────────
+        // The blue-only rule has TWO carved-out exceptions, both authorized
+        // by Loay's PPTX/Excel reference for risk and accountant signals.
+        //
+        // 1. `danger` — used for negative/zero numeric values per the
+        //    accountant rule, AND for the "Very Aggressive" Risk Ranking.
+        // 2. The `risk-*` palette below mirrors the Excel ranking colors
+        //    EXACTLY (slide 91 says "تضليل ألوان المخاطر يجب أن تكون نفس
+        //    ما هو مذكور في ملف اكسل").
+        // Errors stay blue (bg-brand-900 text-white) — these tokens are
+        // strictly for risk-rank badges and negative-number highlights.
         danger:   "#c0392b",
+        "danger-bg": "#fde4e2",   // light pink for negative cell background
+        risk: {
+          conservative:    "#bbf7d0",  // green-200 — Conservative
+          conservativeFg:  "#15803d",  // green-700
+          moderate:        "#fde68a",  // amber-200 — Moderately Conservative (yellow per Excel)
+          moderateFg:      "#92400e",  // amber-800
+          aggressive:      "#fecaca",  // red-200 — Aggressive (orange/pink per Excel)
+          aggressiveFg:    "#991b1b",  // red-800
+          veryAggressive:  "#dc2626",  // red-600 — Very Aggressive (solid red)
+          veryAggressiveFg:"#ffffff",  // white text
+        },
       },
       fontFamily: {
         sans: ["IBM Plex Sans", "system-ui", "sans-serif"],

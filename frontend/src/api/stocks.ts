@@ -40,6 +40,41 @@ export interface StockRow {
   last_analytics_refresh: string | null;
 }
 
+// Sector-level summary + averages (Loay slide 83)
+export interface SectorSummary {
+  sector_code: string;
+  sector_name_ar: string;
+  sector_name_en: string;
+  stock_count: number;
+}
+
+export interface SectorAverages {
+  sector_code: string;
+  sector_name_ar: string;
+  sector_name_en: string;
+  stock_count: number;
+  // Risk
+  avg_beta: number | null;
+  avg_capm_expected_return: number | null;
+  avg_daily_volatility: number | null;
+  avg_annual_volatility: number | null;
+  avg_sharp_ratio: number | null;
+  avg_var_95_daily: number | null;
+  risk_ranking: string | null;
+  // Financial
+  avg_pe_ratio: number | null;
+  avg_market_to_book: number | null;
+  avg_roe: number | null;
+  avg_fcf_yield: number | null;
+  avg_leverage_ratio: number | null;
+  avg_eps: number | null;
+  avg_dividend_yield: number | null;
+  avg_annual_dividend_rate: number | null;
+}
+
 export const StocksAPI = {
   list: () => api<StockRow[]>("/stocks"),
+  sectorsSummary: () => api<SectorSummary[]>("/stocks/sectors-summary"),
+  sectorAverages: (sectorCode: string) =>
+    api<SectorAverages>(`/stocks/sector-averages?sector_code=${encodeURIComponent(sectorCode)}`),
 };

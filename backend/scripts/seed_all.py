@@ -26,27 +26,35 @@ from app.db.session import SessionLocal  # noqa: E402
 
 def main() -> int:
     print("=" * 72)
-    print("Tadawul Portfolio Optimizer — Phase A data seeding")
+    print("Tadawul Portfolio Optimizer — Full data seeding")
     print("=" * 72)
 
     with SessionLocal() as db:
         n_sectors = seed_sectors(db, DEFAULT_INDEX_FILE)
-        print(f"\n[1/6] sectors upserted:           {n_sectors}")
+        print(f"\n[1/7] sectors upserted:           {n_sectors}")
 
         n_stocks = seed_stocks(db, DEFAULT_STOCK_FILE)
-        print(f"[2/6] stocks upserted:            {n_stocks}")
+        print(f"[2/7] stocks upserted:            {n_stocks}")
 
     n_history = seed_sector_history(DEFAULT_INDEX_FILE)
-    print(f"[3/6] sector_index_daily rows:    {n_history:,}")
+    print(f"[3/7] sector_index_daily rows:    {n_history:,}")
 
     n_cfg = seed_admin_config()
-    print(f"[4/6] admin_config defaults:      {n_cfg}")
+    print(f"[4/7] admin_config defaults:      {n_cfg}")
 
     seed_disclaimer()
-    print("[5/6] disclaimer v1 activated")
+    print("[5/7] disclaimer v1 activated")
 
     n_labels = seed_ui_labels()
-    print(f"[6/6] ui_labels seeded:           {n_labels}")
+    print(f"[6/7] ui_labels seeded:           {n_labels}")
+
+    # Demo analytics — populate 25 stocks with realistic screener data
+    try:
+        from scripts.seed_demo_analytics import seed as seed_demo_analytics  # noqa: E402
+        n_demo = seed_demo_analytics()
+        print(f"[7/7] demo analytics seeded:      {n_demo} stocks")
+    except Exception as exc:
+        print(f"[7/7] demo analytics skipped:     {exc}")
 
     print("\n✓ Seeding complete. Run `uvicorn app.main:app --reload` to start the API.")
     return 0

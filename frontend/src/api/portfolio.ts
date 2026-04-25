@@ -84,6 +84,64 @@ export interface PortfolioRun {
   weights: Record<string, number> | null;
 }
 
+// Saved-portfolio CRUD types (Loay slide 1)
+export interface PortfolioHolding {
+  ticker: string;
+  weight: number;
+}
+
+export interface SavedPortfolio {
+  id: number;
+  name: string;
+  description: string | null;
+  initial_capital: number | null;
+  target_loss_threshold: number | null;
+  holdings: PortfolioHolding[];
+  status: "active" | "inactive";
+  holding_count: number;
+  total_weight: number;
+  needs_recompute: boolean | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreatePortfolioPayload {
+  name: string;
+  initial_capital: number | null;
+}
+
+export interface UpdatePortfolioPayload {
+  name?: string;
+  description?: string;
+  initial_capital?: number;
+  target_loss_threshold?: number;
+}
+
+export interface ComputeWeightsPayload {
+  method?: "slsqp" | "qp";
+  risk_free_rate?: number;
+  lookback_days?: number;
+  apply_min_sd_constraint?: boolean;
+  apply_return_floor?: boolean;
+  allow_shorting?: boolean;
+}
+
+export interface ComputeWeightsResult {
+  portfolio_id: number;
+  run_id: number;
+  success: boolean;
+  method: string;
+  message: string;
+  sharpe: number;
+  expected_return: number;
+  volatility: number;
+  risk_free_rate: number;
+  weights: Record<string, number>;
+  annual_volatility: Record<string, number>;
+  beta: Record<string, number>;
+  capm_expected_return: Record<string, number>;
+}
+
 export const PortfolioAPI = {
   optimize: (req: OptimizeRequest) =>
     api<OptimizeResponse>("/portfolio/optimize", { method: "POST", body: req }),
@@ -98,6 +156,42 @@ export const PortfolioAPI = {
     api<MetricsResponse>("/portfolio/metrics", { method: "POST", body: req }),
 
   runs: (limit = 20) => api<PortfolioRun[]>(`/portfolio/runs?limit=${limit}`),
+
+  // Saved-portfolio CRUD (Loay slide 1)
+  listSaved: () => api<SavedPortfolio[]>("/portfolio/"),
+
+  create: (payload: CreatePortfolioPayload) =>
+    api<SavedPortfolio>("/portfolio/", {
+      method: "POST",
+      body: { ...payload, holdings: [] },
+    }),
+
+  update: (id: number, patch: UpdatePortfolioPayload) =>
+    api<SavedPortfolio>(`/portfolio/${id}`, { method: "PATCH", body: patch }),
+
+  remove: (id: number) =>
+    api<void>(`/portfolio/${id}`, { method: "DELETE" }),
+
+  // Holdings (per-stock) + compute weights (closes the "active" loop)
+  addHolding: (id: number, ticker: string) =>
+    api<SavedPortfolio>(`/portfolio/${id}/holdings`, {
+      method: "POST",
+      body: { ticker },
+    }),
+
+  removeHolding: (id: number, ticker: string) =>
+    api<SavedPortfolio>(`/portfolio/${id}/holdings/${encodeURIComponent(ticker)}`, {
+      method: "DELETE",
+    }),
+
+  computeWeights: (id: number, payload: ComputeWeightsPayload = {}) =>
+    api<ComputeWeightsResult>(`/portfolio/${id}/compute`, {
+      method: "POST",
+      body: payload,
+    }),
+
+  getOne: (id: number) =>
+    api<SavedPortfolio>(`/portfolio/${id}`),
 
   reportPdfUrl: (runId: number, locale: "ar" | "en") =>
     // GET endpoint: we expose a URL plus a token the browser can attach via Authorization.

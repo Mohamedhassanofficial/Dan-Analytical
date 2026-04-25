@@ -1,0 +1,35 @@
+# Tadawul Portfolio Optimizer — Local Development Stack
+#
+# Usage:
+#   docker compose up -d          # start PostgreSQL
+#   docker compose down           # stop
+#   docker compose down -v        # stop + delete data
+#
+# After starting, init the DB:
+#   cd backend
+#   python -m scripts.init_db
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tadawul-pg
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: tadawul
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      # Performance tuning for dev (not for production)
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tadawul"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local

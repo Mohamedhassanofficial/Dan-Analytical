@@ -98,6 +98,22 @@ button {
   .screener-cell {
     @apply px-3 py-2 text-sm whitespace-nowrap;
   }
+
+  /* Negative numeric cell — light pink background per PPTX slide 91. The
+     accountant rule already turns the text red; this adds the visual
+     "warning" surface Loay's spec calls for.                            */
+  .cell-negative {
+    @apply bg-danger-bg text-danger font-semibold;
+  }
+
+  /* ── Risk Ranking badges (Excel colors, NOT blue-only) ──────────
+     Per slide 91: "مسمى درجة المخاطر وكذلك تضليل مخاطر الألوان يجب
+     أن تكون نفس ما هو مذكور في ملف اكسل" — this carve-out is sanctioned
+     by the spec and overrides the otherwise blue-only theme.            */
+  .badge-risk-conservative      { @apply badge bg-risk-conservative   text-risk-conservativeFg; }
+  .badge-risk-moderate          { @apply badge bg-risk-moderate       text-risk-moderateFg; }
+  .badge-risk-aggressive        { @apply badge bg-risk-aggressive     text-risk-aggressiveFg; }
+  .badge-risk-very-aggressive   { @apply badge bg-risk-veryAggressive text-risk-veryAggressiveFg; }
   .screener-th {
     @apply px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white
            bg-brand-800 border-b border-brand-900 whitespace-nowrap;

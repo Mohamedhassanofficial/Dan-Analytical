@@ -9,13 +9,14 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from fastapi import APIRouter
-from sqlalchemy import select
+from fastapi import APIRouter, HTTPException, status
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.api.deps import CurrentUserDep, DbDep
-from app.db.models import Stock
-from app.schemas.stocks import StockRow
+from app.db.models import Sector, Stock
+from app.schemas.stocks import SectorAveragesOut, SectorSummary, StockRow
+from app.services.sector_analytics import compute_sector_averages
 
 router = APIRouter(prefix="/stocks", tags=["stocks"])
 
@@ -67,3 +68,53 @@ def list_stocks(db: DbDep, _: CurrentUserDep) -> list[StockRow]:
         )
         for s in rows
     ]
+
+
+# ---------------------------------------------------------------------------
+# Sector averages (Loay slide 83 — "احتساب متوسط أداء القطاع الصناعي")
+# ---------------------------------------------------------------------------
+@router.get("/sectors-summary", response_model=list[SectorSummary])
+def list_sectors_summary(db: DbDep, _: CurrentUserDep) -> list[SectorSummary]:
+    """
+    Lightweight per-sector summary used to populate the sector picker on the
+    Screener: code + bilingual name + count of active stocks.
+    """
+    rows = db.execute(
+        select(
+            Sector.sector_code,
+            Sector.name_ar,
+            Sector.name_en,
+            func.count(Stock.id).label("stock_count"),
+        )
+        .join(Stock, Stock.sector_id == Sector.id, isouter=True)
+        .where(Sector.is_active.is_(True))
+        .group_by(Sector.id, Sector.sector_code, Sector.name_ar, Sector.name_en)
+        .order_by(Sector.sector_code)
+    ).all()
+    return [
+        SectorSummary(
+            sector_code=r.sector_code,
+            sector_name_ar=r.name_ar,
+            sector_name_en=r.name_en,
+            stock_count=int(r.stock_count or 0),
+        )
+        for r in rows
+    ]
+
+
+@router.get("/sector-averages", response_model=SectorAveragesOut)
+def sector_averages(
+    sector_code: str, db: DbDep, _: CurrentUserDep
+) -> SectorAveragesOut:
+    """
+    Return the average of every analytical indicator across stocks in the
+    given sector. Per Loay slide 83: "All analytical indicators for the
+    industrial sector are computed on a sector-average basis (sum / count)."
+
+    Risk Ranking is derived from the *averaged* annual_volatility using the
+    same slide-105 thresholds applied to individual stocks.
+    """
+    result = compute_sector_averages(db, sector_code)
+    if result is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"Unknown sector: {sector_code}")
+    return SectorAveragesOut(**result.to_dict())
