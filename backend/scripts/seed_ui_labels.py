@@ -363,6 +363,16 @@ INDICATOR_DESCRIPTIONS: list[tuple[str, str, str]] = [
     ("screener.col_dividend_date",
      "تاريخ آخر توزيع نقدي تمت الموافقة عليه (يكون قبل تاريخ الاستحقاق).",
      "Date of the most recently approved cash dividend."),
+    # Home cards (Loay slide #2) — the (i) icon on each card pulls these.
+    ("home.card1_explainer",
+     "ابدأ من هنا لإنشاء محفظة استثمارية جديدة باسم ومبلغ، أو لتعديل/حذف محافظك القائمة.",
+     "Start here to create a new portfolio with a name and amount, or edit/delete an existing one."),
+    ("home.card2_explainer",
+     "يفتح شاشة الـ Screener — 14 مؤشر مالي ومخاطر لكل سهم + فلاتر مالية وفلاتر مخاطر مستقلة.",
+     "Opens the Screener — 14 financial + risk indicators per stock with two independent filter groups."),
+    ("home.card3_explainer",
+     "ادخل من هنا إلى شاشة المحفظة، اضغط 'احتساب الأوزان' لتشغيل خوارزمية ماركويتز، وراجع Sharpe / العائد المتوقع / التذبذب لكل سهم.",
+     "Enter the portfolio screen, click 'Compute weights' to run the Markowitz solver, then review Sharpe / expected return / volatility per holding."),
 ]
 
 

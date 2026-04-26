@@ -15,7 +15,14 @@ import { useLocale } from "@/contexts/LocaleContext";
  * descriptions are still being seeded or for keys that don't carry one
  * (identity columns like Symbol / Name).
  */
-export default function HeaderInfo({ labelKey }: { labelKey: string }) {
+export default function HeaderInfo({
+  labelKey,
+  iconSize = 12,
+}: {
+  labelKey: string;
+  /** Icon px size — small for table headers (12), larger for card corners (18). */
+  iconSize?: number;
+}) {
   const { labels } = useLabelsContext();
   const { locale } = useLocale();
   const label = useLabel();
@@ -63,7 +70,7 @@ export default function HeaderInfo({ labelKey }: { labelKey: string }) {
         }}
         aria-label={text ?? labelKey}
       >
-        <Info size={12} />
+        <Info size={iconSize} />
       </button>
       {open && (
         <span

@@ -111,25 +111,25 @@ function ActionCard({
 }) {
   const label = useLabel();
   return (
-    <div className="card relative flex flex-col gap-3 p-5">
+    <div className="card relative flex h-full flex-col gap-3 p-5">
       {/* Number badge top-start */}
-      <div className="absolute top-3 start-3 grid h-7 w-7 place-items-center rounded-full bg-brand-500 text-xs font-bold text-white shadow">
+      <div className="absolute top-3 start-3 grid h-8 w-8 place-items-center rounded-full bg-brand-500 text-sm font-bold text-white shadow">
         {number}
       </div>
-      {/* Per-card explainer (i) — top-end */}
+      {/* Per-card explainer (i) — top-end. Bigger than column-header icons. */}
       <div className="absolute top-3 end-3">
-        <HeaderInfo labelKey={explainerKey} />
+        <HeaderInfo labelKey={explainerKey} iconSize={20} />
       </div>
 
       {/* Centered icon */}
-      <div className="mx-auto mt-6 grid h-16 w-16 place-items-center rounded-2xl bg-brand-50 text-brand-700">
+      <div className="mx-auto mt-7 grid h-20 w-20 place-items-center rounded-2xl bg-brand-50 text-brand-700">
         {icon}
       </div>
 
-      <h3 className="text-center text-base font-semibold leading-snug text-brand-900">
+      <h3 className="line-clamp-3 min-h-[3.6rem] text-center text-base font-semibold leading-snug text-brand-900">
         {label(titleKey)}
       </h3>
-      <p className="text-center text-sm text-muted">{label(descKey)}</p>
+      <p className="flex-1 text-center text-sm text-muted">{label(descKey)}</p>
 
       <button className="btn-primary mt-2 w-full justify-center" onClick={onOpen}>
         {label("home.open_button")}
