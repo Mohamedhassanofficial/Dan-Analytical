@@ -8,6 +8,7 @@ import {
   TrendingUp,
   User,
 } from "lucide-react";
+import BrandLogo from "./BrandLogo";
 import { useLabel } from "@/contexts/LabelsContext";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -29,14 +30,8 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed inset-y-0 start-0 z-30 hidden w-64 flex-col bg-navy px-4 py-6 text-white lg:flex">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="grid h-10 w-10 place-items-center rounded-lg bg-brand-500 text-white">
-          <TrendingUp size={22} strokeWidth={2.2} />
-        </div>
-        <div className="leading-tight">
-          <p className="text-sm font-semibold">{label("app.name")}</p>
-          <p className="text-xs text-white/60">Tadawul</p>
-        </div>
+      <div className="mb-8 flex items-center gap-2 rounded-lg bg-white/95 p-2">
+        <BrandLogo size="md" />
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">

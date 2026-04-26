@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DAN Analytical brand emblem.
+
+  Loay named the project after his son Dan (10 yrs). The mark is a gold
+  medallion with a stylised "DAN" inside; the wordmark "ANALYTICAL
+  APPLICATIONS" curls beneath. Designed to render crisply at any size and
+  to live in the app's TopBar.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="DAN Analytical Applications">
+  <defs>
+    <linearGradient id="danGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#f3d575" />
+      <stop offset="55%" stop-color="#d4a437" />
+      <stop offset="100%" stop-color="#a47820" />
+    </linearGradient>
+    <linearGradient id="danCream" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"  stop-color="#fdf6dc" />
+      <stop offset="100%" stop-color="#f3e7b1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Circular medallion -->
+  <g transform="translate(40 40)">
+    <circle r="34" fill="url(#danGold)" />
+    <circle r="28" fill="url(#danCream)" stroke="#a47820" stroke-width="0.8" />
+    <!-- "DAN" wordmark inside the medallion -->
+    <text x="0" y="6"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="22"
+          font-weight="700"
+          fill="#0c1a3c"
+          text-anchor="middle"
+          letter-spacing="0.5">DAN</text>
+    <!-- subtle mark above the D, mirroring the seal feel -->
+    <text x="-12" y="-9"
+          font-family="Georgia, serif"
+          font-size="6"
+          font-weight="700"
+          fill="#a47820"
+          text-anchor="middle">★</text>
+  </g>
+
+  <!-- Wordmark to the right of the medallion -->
+  <g transform="translate(86 0)">
+    <text x="0" y="36"
+          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+          font-size="22"
+          font-weight="800"
+          fill="#0c1a3c"
+          letter-spacing="1.2">DAN</text>
+    <text x="0" y="56"
+          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+          font-size="11"
+          font-weight="600"
+          fill="#1f3a73"
+          letter-spacing="2.5">ANALYTICAL</text>
+    <text x="0" y="70"
+          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+          font-size="9"
+          font-weight="500"
+          fill="#5b6f9a"
+          letter-spacing="2.5">APPLICATIONS</text>
+  </g>
+</svg>

@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "Tadawul Portfolio Optimizer",
-    "tagline": "Bilingual Markowitz / CAPM / VaR analytics for Saudi investors"
+    "name": "DAN Analytical Applications",
+    "tagline": "Portfolio Optimizer — Harry Markowitz theory"
   },
   "common": {
     "loading": "Loading…",

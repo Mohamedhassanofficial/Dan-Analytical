@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { LogOut, UserCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocale } from "@/contexts/LocaleContext";
+import BrandLogo from "./BrandLogo";
 import LanguageSwitch from "./LanguageSwitch";
 
 export default function TopBar() {
@@ -15,8 +16,11 @@ export default function TopBar() {
       : user?.full_name_en || user?.full_name_ar || user?.email;
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-white/95 px-6 backdrop-blur">
-      <div />
+    <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-border bg-white/95 px-4 backdrop-blur sm:px-6">
+      {/* Brand: Loay specifically asked for the DAN logo to be prominent at
+          the top of every screen — the platform is named after his son. */}
+      <BrandLogo size="lg" />
+
       <div className="flex items-center gap-3">
         <LanguageSwitch />
         {user && (
