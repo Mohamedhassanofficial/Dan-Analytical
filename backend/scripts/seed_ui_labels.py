@@ -241,6 +241,10 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
     ("sector_avg.btn_calculate","احتساب",                             "Calculate",                    "sector_avg", None),
     ("sector_avg.count_chip",   "{{name}} – عددها {{n}}",             "{{name}} – {{n}} stocks",      "sector_avg", "Keep {{name}} and {{n}} placeholders."),
 
+    # ── (i) tooltip AR/EN toggle (Loay slide 5) ─────────────────────────
+    ("tooltip.lang_ar",         "العربية",                            "Arabic",                       "tooltip", None),
+    ("tooltip.lang_en",         "English",                            "English",                      "tooltip", None),
+
     # ── Disclosure-date columns (Loay slide — Financial Ratios band) ───
     ("screener.col_balance_sheet_date",
                                   "آخر تحديث للميزانية العمومية",
