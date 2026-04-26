@@ -1,19 +1,27 @@
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Filter,
-  Wand2,
   Briefcase,
-  History,
+  GraduationCap,
+  Home,
+  LineChart,
   Settings,
-  Upload,
   TrendingUp,
+  User,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useLabel } from "@/contexts/LabelsContext";
 import { useAuth } from "@/contexts/AuthContext";
 
+/**
+ * Sidebar nav — 7 items per Loay slide #2.
+ *
+ * Order (top → bottom):
+ *   الرئيسية / الأسواق / الأسهم / المحافظ / التعليم / عن المالك / إدارة النظام
+ *
+ * `/optimize` and `/history` are not in the sidebar in this iteration; they
+ * stay reachable by URL or via PortfolioDetails.
+ */
 export default function Sidebar() {
-  const { t } = useTranslation();
+  const label = useLabel();
   const { user } = useAuth();
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -26,51 +34,43 @@ export default function Sidebar() {
           <TrendingUp size={22} strokeWidth={2.2} />
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-semibold">{t("app.name")}</p>
+          <p className="text-sm font-semibold">{label("app.name")}</p>
           <p className="text-xs text-white/60">Tadawul</p>
         </div>
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
         <NavLink to="/" end className={linkClass}>
-          <LayoutDashboard size={18} />
-          {t("nav.dashboard")}
+          <Home size={18} />
+          {label("nav.home")}
+        </NavLink>
+        <NavLink to="/markets" className={linkClass}>
+          <LineChart size={18} />
+          {label("nav.markets")}
         </NavLink>
         <NavLink to="/screener" className={linkClass}>
-          <Filter size={18} />
-          {t("nav.screener")}
-        </NavLink>
-        <NavLink to="/optimize" className={linkClass}>
-          <Wand2 size={18} />
-          {t("nav.optimize")}
+          <TrendingUp size={18} />
+          {label("nav.stocks")}
         </NavLink>
         <NavLink to="/portfolios" className={linkClass}>
           <Briefcase size={18} />
-          {t("nav.portfolios")}
+          {label("nav.portfolios")}
         </NavLink>
-        <NavLink to="/history" className={linkClass}>
-          <History size={18} />
-          {t("nav.history")}
+        <NavLink to="/education" className={linkClass}>
+          <GraduationCap size={18} />
+          {label("nav.education")}
         </NavLink>
-
+        <NavLink to="/about" className={linkClass}>
+          <User size={18} />
+          {label("nav.about")}
+        </NavLink>
         {user?.is_admin && (
-          <>
-            <div className="mt-6 mb-1 px-3 text-xs uppercase tracking-wider text-white/40">
-              {t("nav.admin")}
-            </div>
-            <NavLink to="/admin/config" className={linkClass}>
-              <Settings size={18} />
-              {t("nav.admin_config")}
-            </NavLink>
-            <NavLink to="/admin/upload" className={linkClass}>
-              <Upload size={18} />
-              {t("nav.admin_upload")}
-            </NavLink>
-          </>
+          <NavLink to="/admin/config" className={linkClass}>
+            <Settings size={18} />
+            {label("nav.admin")}
+          </NavLink>
         )}
       </nav>
-
-      <footer className="mt-4 text-xs text-white/40">v0.3.0 · Phase B</footer>
     </aside>
   );
 }

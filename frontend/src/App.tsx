@@ -8,12 +8,16 @@ import DisclaimerPage from "@/pages/Disclaimer";
 import SubscribePage from "@/pages/Subscribe";
 import PaymentReturnPage from "@/pages/PaymentReturn";
 
+import HomePage from "@/pages/Home";
 import DashboardPage from "@/pages/Dashboard";
 import ScreenerPage from "@/pages/Screener";
 import OptimizePage from "@/pages/Optimize";
 import HistoryPage from "@/pages/History";
 import PortfolioListPage from "@/pages/PortfolioList";
 import PortfolioDetailsPage from "@/pages/PortfolioDetails";
+import MarketsPage from "@/pages/Markets";
+import EducationPage from "@/pages/Education";
+import AboutPage from "@/pages/About";
 import AdminConfigPage from "@/pages/admin/Config";
 import AdminUploadPage from "@/pages/admin/Upload";
 
@@ -38,12 +42,16 @@ export default function App() {
         }
       >
         <Route element={<Layout />}>
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/markets" element={<MarketsPage />} />
           <Route path="/screener" element={<ScreenerPage />} />
           <Route path="/optimize" element={<OptimizePage />} />
           <Route path="/portfolios" element={<PortfolioListPage />} />
           <Route path="/portfolios/:id" element={<PortfolioDetailsPage />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/education" element={<EducationPage />} />
+          <Route path="/about" element={<AboutPage />} />
         </Route>
       </Route>
 
