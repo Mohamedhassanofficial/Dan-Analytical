@@ -2,13 +2,14 @@
 <!--
   DAN Analytical brand mark — Arabic variant.
 
-  Same gold medallion as the English version (the medallion itself reads
-  "DAN" in Latin — it is a fixed emblem, not language-specific). The
-  wordmark on the side switches to "دان التحليلي" in Arabic, mirrored to
-  the right of the medallion to match RTL reading flow.
+  Same gold medallion as the English version (the medallion's "DAN" is a
+  fixed Latin emblem, language-neutral). The wordmark on the side
+  switches to "دان التحليلي" — the Arabic brand Loay uses — anchored to
+  the right edge of the wordmark area and flowing leftward (Arabic glyph
+  runs are RTL by default; we don't add direction="rtl" because that
+  combined with text-anchor="end" would push the text into the medallion).
 
-  Loay's note: the project is named after his son Dan; treat the logo
-  with extra care.
+  Loay's note: project named after his son Dan. Treat the logo with care.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="دان التحليلي">
   <defs>
@@ -23,8 +24,8 @@
     </linearGradient>
   </defs>
 
-  <!-- Circular medallion — anchored on the END (right) so the layout
-       reads right-to-left in Arabic context. -->
+  <!-- Medallion on the RIGHT (mirrors the EN version's left-anchored
+       medallion so AR readers see the wordmark first). -->
   <g transform="translate(200 40)">
     <circle r="34" fill="url(#danGoldAr)" />
     <circle r="28" fill="url(#danCreamAr)" stroke="#a47820" stroke-width="0.8" />
@@ -43,24 +44,24 @@
           text-anchor="middle">★</text>
   </g>
 
-  <!-- Arabic wordmark to the LEFT of the medallion (RTL natural flow). -->
-  <g transform="translate(154 0)">
-    <text x="0" y="36"
-          direction="rtl"
+  <!-- Arabic wordmark anchored on the RIGHT edge of the wordmark area
+       (x=154), flowing leftward. No direction attribute — the browser
+       handles Arabic glyph order within each text run. Vertical sizes
+       match the EN version: 22 / 11 / 9. -->
+  <g transform="translate(0 0)">
+    <text x="154" y="36"
           font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
-          font-size="24"
+          font-size="22"
           font-weight="800"
           fill="#0c1a3c"
           text-anchor="end">دان</text>
-    <text x="0" y="58"
-          direction="rtl"
+    <text x="154" y="56"
           font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
-          font-size="14"
+          font-size="11"
           font-weight="600"
           fill="#1f3a73"
           text-anchor="end">التحليلي</text>
-    <text x="0" y="72"
-          direction="rtl"
+    <text x="154" y="70"
           font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
           font-size="9"
           font-weight="500"
