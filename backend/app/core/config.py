@@ -10,7 +10,7 @@ Usage:
 """
 from __future__ import annotations
 
-from pydantic import Field, PostgresDsn, field_validator
+from pydantic import Field, PostgresDsn, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -88,6 +88,29 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _normalise_sync_url(cls, v):
+        # Render's managed Postgres exposes DATABASE_URL as `postgres://…`. Pydantic's
+        # PostgresDsn needs the explicit driver, so swap to psycopg2 here.
+        if isinstance(v, str) and v.startswith("postgres://"):
+            return "postgresql+psycopg2://" + v[len("postgres://"):]
+        if isinstance(v, str) and v.startswith("postgresql://"):
+            return "postgresql+psycopg2://" + v[len("postgresql://"):]
+        return v
+
+    @model_validator(mode="after")
+    def _derive_async_url(self):
+        # If only DATABASE_URL is set (Render's default), build the async one
+        # from it by swapping the driver. Local dev still wins via .env override.
+        sync_str = str(self.database_url)
+        default_async = "postgresql+asyncpg://postgres:postgres@localhost:5432/tadawul"
+        if self.database_url_async == default_async and sync_str.startswith("postgresql+psycopg2://"):
+            self.database_url_async = sync_str.replace(
+                "postgresql+psycopg2://", "postgresql+asyncpg://", 1,
+            )
+        return self
 
 
 settings = Settings()

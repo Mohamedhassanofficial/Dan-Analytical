@@ -32,6 +32,7 @@ asyncpg==0.30.0             # async driver for high-concurrency endpoints
 
 # --- Auth (Phase B, staged here so Alembic user model can import) ---
 passlib[bcrypt]==1.7.4
+bcrypt==4.3.0               # pin <5 — passlib 1.7.4 is incompatible with bcrypt 5.x
 python-jose[cryptography]==3.3.0
 
 # --- PDF export (Phase B) with Arabic shaping support ---
