@@ -31,7 +31,7 @@ export default function DataSourcesFooter() {
       <div className="bg-brand-700 px-4 py-2 text-center text-sm font-semibold text-white">
         {label("data_sources.title")}
       </div>
-      <div className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 items-stretch gap-3 p-3 sm:grid-cols-3">
         <SourceCard
           titleKey="data_sources.card_stock_prices_title"
           range={data.stock_prices}
@@ -61,14 +61,22 @@ function SourceCard({
   const toText = range.date_to ?? "—";
 
   return (
-    <div className="rounded-lg border border-brand-200 bg-brand-50 p-3 text-sm">
-      <div className="font-semibold text-brand-900 leading-snug">
+    <div className="flex h-full flex-col rounded-lg border border-brand-200 bg-brand-50 p-3 text-sm">
+      {/* Title — fixed three-line slot so all three cards align even when
+          one title (sector indices) wraps deeper than the other two. */}
+      <div className="line-clamp-3 min-h-[3.6rem] text-sm font-semibold leading-snug text-brand-900">
         {label(titleKey)}
       </div>
-      <div className="mt-1 text-xs text-brand-800">
+
+      {/* Dates — single nowrap line with tabular numerals so the digits
+          line up across cards and don't break in the middle of a date. */}
+      <div className="mt-2 whitespace-nowrap text-xs tabular-nums text-brand-800">
         {label("data_sources.from_to", { from: fromText, to: toText })}
       </div>
-      <div className="mt-3 flex items-center justify-between rounded-md border border-brand-200 bg-white px-2 py-1.5">
+
+      {/* Source row — mt-auto pushes the pill to the bottom of the
+          flex column so every card's source row sits on the same line. */}
+      <div className="mt-auto flex items-center justify-between gap-2 rounded-md border border-brand-200 bg-white px-2 py-1.5">
         <div className="inline-flex items-center gap-1.5 text-xs text-brand-900">
           <Database size={14} className="text-brand-700" />
           <span className="font-semibold">{label("data_sources.data_source_label")}</span>
