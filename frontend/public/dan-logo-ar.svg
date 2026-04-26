@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DAN Analytical brand mark — Arabic variant.
+
+  Same gold medallion as the English version (the medallion itself reads
+  "DAN" in Latin — it is a fixed emblem, not language-specific). The
+  wordmark on the side switches to "دان التحليلي" in Arabic, mirrored to
+  the right of the medallion to match RTL reading flow.
+
+  Loay's note: the project is named after his son Dan; treat the logo
+  with extra care.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="دان التحليلي">
+  <defs>
+    <linearGradient id="danGoldAr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#f3d575" />
+      <stop offset="55%" stop-color="#d4a437" />
+      <stop offset="100%" stop-color="#a47820" />
+    </linearGradient>
+    <linearGradient id="danCreamAr" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"  stop-color="#fdf6dc" />
+      <stop offset="100%" stop-color="#f3e7b1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Circular medallion — anchored on the END (right) so the layout
+       reads right-to-left in Arabic context. -->
+  <g transform="translate(200 40)">
+    <circle r="34" fill="url(#danGoldAr)" />
+    <circle r="28" fill="url(#danCreamAr)" stroke="#a47820" stroke-width="0.8" />
+    <text x="0" y="6"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="22"
+          font-weight="700"
+          fill="#0c1a3c"
+          text-anchor="middle"
+          letter-spacing="0.5">DAN</text>
+    <text x="-12" y="-9"
+          font-family="Georgia, serif"
+          font-size="6"
+          font-weight="700"
+          fill="#a47820"
+          text-anchor="middle">★</text>
+  </g>
+
+  <!-- Arabic wordmark to the LEFT of the medallion (RTL natural flow). -->
+  <g transform="translate(154 0)">
+    <text x="0" y="36"
+          direction="rtl"
+          font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
+          font-size="24"
+          font-weight="800"
+          fill="#0c1a3c"
+          text-anchor="end">دان</text>
+    <text x="0" y="58"
+          direction="rtl"
+          font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
+          font-size="14"
+          font-weight="600"
+          fill="#1f3a73"
+          text-anchor="end">التحليلي</text>
+    <text x="0" y="72"
+          direction="rtl"
+          font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
+          font-size="9"
+          font-weight="500"
+          fill="#5b6f9a"
+          text-anchor="end">منصة المحفظة الاستثمارية</text>
+  </g>
+</svg>

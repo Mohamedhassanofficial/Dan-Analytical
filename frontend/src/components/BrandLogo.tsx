@@ -1,17 +1,19 @@
 import { NavLink } from "react-router-dom";
+import { useLocale } from "@/contexts/LocaleContext";
 
 /**
  * DAN Analytical brand mark.
  *
  * The product is named after Loay's 10-year-old son Dan ("تيمناً بيه و
  * عشان يكون وش السعد"). Loay asked for the logo to live prominently in
- * every screen header rather than being tucked into the sidebar — this
- * component is the single source of truth for that. Two size variants
- * keep the medallion legible whether it's in the TopBar or in the dark
- * sidebar header.
+ * every screen header and to render in the user's chosen language —
+ * Arabic users see the Arabic wordmark "دان التحليلي", English users
+ * see "DAN ANALYTICAL APPLICATIONS". The medallion itself stays the same
+ * gold seal in both versions.
  *
- * Source asset: `public/dan-logo.svg`. When a higher-res official asset
- * lands in the repo, swap the `src` here in one place.
+ * Source assets: `public/dan-logo.svg` (EN) + `public/dan-logo-ar.svg`
+ * (AR). When higher-res official assets land, swap them in the same
+ * filenames — every header picks them up automatically.
  */
 
 interface BrandLogoProps {
@@ -30,15 +32,16 @@ export default function BrandLogo({
   inverse = false,
   className = "",
 }: BrandLogoProps) {
+  const { locale } = useLocale();
+  const src = locale === "ar" ? "/dan-logo-ar.svg" : "/dan-logo.svg";
+  const alt = locale === "ar" ? "دان التحليلي" : "DAN Analytical Applications";
+
   const heightClass = size === "lg" ? "h-12 sm:h-14" : "h-10";
   const content = (
-    <span
-      className={`inline-flex items-center gap-1 ${className}`}
-      aria-label="DAN Analytical Applications"
-    >
+    <span className={`inline-flex items-center gap-1 ${className}`} aria-label={alt}>
       <img
-        src="/dan-logo.svg"
-        alt="DAN Analytical Applications"
+        src={src}
+        alt={alt}
         className={`${heightClass} w-auto select-none drop-shadow-sm`}
         draggable={false}
         style={inverse ? { filter: "drop-shadow(0 0 1px rgba(255,255,255,0.4))" } : undefined}
@@ -49,7 +52,7 @@ export default function BrandLogo({
   if (!linked) return content;
 
   return (
-    <NavLink to="/" className="inline-flex items-center" aria-label="DAN Analytical home">
+    <NavLink to="/" className="inline-flex items-center" aria-label={alt}>
       {content}
     </NavLink>
   );
