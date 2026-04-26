@@ -71,6 +71,100 @@ class DataSourcesOut(BaseModel):
     last_update: DataSourceRange
 
 
+# ── Stock Analyze page (Loay slides 98-99 / 109-111) ────────────────────────
+class ReturnDistributionBucket(BaseModel):
+    """One histogram bucket on the stock-return probability chart."""
+    lower: float
+    upper: float
+    frequency_pct: float
+
+
+class PricePoint(BaseModel):
+    trade_date: date
+    close: float
+
+
+class ReturnPair(BaseModel):
+    trade_date: date
+    stock_return: float
+    index_return: float | None
+
+
+class StockAnalyticsOut(BaseModel):
+    """Full payload for the per-stock Analyze page."""
+    # Identity
+    symbol: str
+    ticker_suffix: str
+    name_ar: str | None
+    name_en: str | None
+    sector_code: str | None
+    industry_ar: str | None
+    industry_en: str | None
+
+    # Stock Movement block
+    last_price: float | None
+    last_price_date: date | None
+    week52_high: float | None
+    week52_low: float | None
+    avg_price_midpoint: float | None
+    min_return_250d: float | None
+    max_return_250d: float | None
+
+    # Stock Risk Measurement block
+    beta: float | None
+    capm_expected_return: float | None
+    daily_volatility: float | None
+    annual_volatility: float | None
+    sharp_ratio: float | None
+    var_95_daily: float | None
+    risk_ranking: str | None
+
+    # Financial Ratios block — the 14 + the 16 extras from Phase B
+    pe_ratio: float | None
+    market_to_book: float | None
+    roe: float | None
+    fcf_yield: float | None
+    leverage_ratio: float | None
+    eps: float | None
+    dividend_yield: float | None
+    annual_dividend_rate: float | None
+    current_ratio: float | None
+    quick_ratio: float | None
+    cash_ratio: float | None
+    interest_coverage_ratio: float | None
+    asset_turnover: float | None
+    inventory_turnover: float | None
+    receivables_turnover: float | None
+    payables_turnover: float | None
+    roa: float | None
+    net_profit_margin: float | None
+    gross_profit_margin: float | None
+    book_value_per_share: float | None
+    revenue_per_share: float | None
+    debt_to_market_cap: float | None
+    cash_to_assets: float | None
+    receivables_to_assets: float | None
+
+    # Disclosure dates
+    last_balance_sheet_date: date | None
+    last_income_statement_date: date | None
+    latest_dividend_date: date | None
+
+    # Support & resistance (from last 30 trading days)
+    support_price: float | None
+    resistance_price: float | None
+    midpoint_price: float | None
+
+    # Charts: probability distribution + price history + stock-vs-index pair
+    return_distribution: list[ReturnDistributionBucket]
+    price_history: list[PricePoint]
+    stock_vs_index: list[ReturnPair]
+
+    # CAPM-derived expected returns (used by the Expected Stock Return block)
+    expected_annual_return: float | None
+    expected_daily_return: float | None
+
+
 class SectorAveragesOut(BaseModel):
     """Sector-level averages of the 14 indicators (Loay's slide 83)."""
     sector_code: str

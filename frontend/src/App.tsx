@@ -11,6 +11,7 @@ import PaymentReturnPage from "@/pages/PaymentReturn";
 import HomePage from "@/pages/Home";
 import DashboardPage from "@/pages/Dashboard";
 import ScreenerPage from "@/pages/Screener";
+import StockAnalyzePage from "@/pages/StockAnalyze";
 import OptimizePage from "@/pages/Optimize";
 import HistoryPage from "@/pages/History";
 import PortfolioListPage from "@/pages/PortfolioList";
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/markets" element={<MarketsPage />} />
           <Route path="/screener" element={<ScreenerPage />} />
+          <Route path="/stocks/:ticker/analyze" element={<StockAnalyzePage />} />
           <Route path="/optimize" element={<OptimizePage />} />
           <Route path="/portfolios" element={<PortfolioListPage />} />
           <Route path="/portfolios/:id" element={<PortfolioDetailsPage />} />

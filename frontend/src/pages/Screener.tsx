@@ -528,7 +528,7 @@ export default function ScreenerPage() {
                         <button
                           className="btn-ghost h-8 px-2 py-0"
                           title={label("screener.analyze")}
-                          disabled
+                          onClick={() => navigate(`/stocks/${r.ticker_suffix}/analyze`)}
                         >
                           <BarChart3 size={14} />
                           <span className="hidden lg:inline">{label("screener.analyze")}</span>
