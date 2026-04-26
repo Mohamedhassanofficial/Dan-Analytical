@@ -59,23 +59,16 @@ services:
         value: Asia/Riyadh
 
   # ── React frontend (static) ───────────────────────────────────────────────
+  # Headers + SPA rewrite routes are configured via the Render dashboard
+  # after the first successful deploy (Static Site → Redirects/Rewrites
+  # and Headers tabs). Keeping the Blueprint minimal avoids validator
+  # rejections on first-time deploys.
   - type: web
     name: tadawul-web
     runtime: static
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
-    headers:
-      - path: /*
-        name: Cache-Control
-        value: "public, max-age=0, must-revalidate"
-      - path: /assets/*
-        name: Cache-Control
-        value: "public, max-age=31536000, immutable"
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
     envVars:
       - key: NODE_VERSION
         value: "20.18.0"
