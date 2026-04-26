@@ -5,6 +5,10 @@
 *.pptx
 *.pdf
 
+# Reference catalogues that the seed scripts need on every fresh deploy.
+!Index-Data-From-28-02-2016-To26-02-2026.csv
+!Stock-List-Arabic-and-English.xlsx
+
 # --- Python ---
 __pycache__/
 *.py[cod]

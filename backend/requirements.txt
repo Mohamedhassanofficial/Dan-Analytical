@@ -22,6 +22,7 @@ fastapi==0.115.6
 uvicorn[standard]==0.32.1
 pydantic==2.10.3
 pydantic-settings==2.7.0   # typed environment config loader
+email-validator==2.2.0     # required by pydantic.EmailStr in auth schemas
 python-multipart==0.0.20   # required for FastAPI file uploads (Excel admin form)
 
 # --- Database ---
