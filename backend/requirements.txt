@@ -36,6 +36,9 @@ passlib[bcrypt]==1.7.4
 bcrypt==4.3.0               # pin <5 — passlib 1.7.4 is incompatible with bcrypt 5.x
 python-jose[cryptography]==3.3.0
 
+# --- HTTP client for STCPay / PayTabs payment gateways (eager import) ---
+httpx==0.28.1
+
 # --- PDF export (Phase B) with Arabic shaping support ---
 reportlab==4.2.5
 arabic-reshaper==3.0.0
