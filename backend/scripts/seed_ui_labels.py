@@ -245,6 +245,13 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
     ("tooltip.lang_ar",         "العربية",                            "Arabic",                       "tooltip", None),
     ("tooltip.lang_en",         "English",                            "English",                      "tooltip", None),
 
+    # ── Filter modal help banner (Loay slide 6) ─────────────────────────
+    ("filter_modal.help_title", "كيفية استخدام الفلاتر",              "How to use the filters",       "screener", None),
+    ("filter_modal.help_body",
+        "اختر المؤشر الذي تريد التصفية من خلاله، ويمكنك اختيار أكثر من مؤشر في نفس الوقت.",
+        "Pick the indicator you want to filter by — you can pick more than one at the same time.",
+        "screener", None),
+
     # ── Disclosure-date columns (Loay slide — Financial Ratios band) ───
     ("screener.col_balance_sheet_date",
                                   "آخر تحديث للميزانية العمومية",

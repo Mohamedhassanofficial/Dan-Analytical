@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Lightbulb, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLabel } from "@/contexts/LabelsContext";
 
@@ -112,6 +112,17 @@ export default function IndicatorFilterModal({
 
         {/* Body */}
         <div className="max-h-[60vh] overflow-y-auto px-5 py-4">
+          {/* Help banner — Loay slide 6 */}
+          <div className="mb-4 flex items-start gap-2 rounded-md border border-brand-200 bg-brand-50 p-3 text-sm">
+            <Lightbulb size={18} className="mt-0.5 flex-none text-brand-700" />
+            <div className="leading-snug text-brand-900">
+              <div className="font-semibold">{label("filter_modal.help_title")}</div>
+              <div className="mt-0.5 text-xs text-brand-800">
+                {label("filter_modal.help_body")}
+              </div>
+            </div>
+          </div>
+
           <table className="w-full text-sm">
             <thead>
               <tr className="text-muted text-start">
