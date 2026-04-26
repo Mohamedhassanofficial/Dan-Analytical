@@ -29,7 +29,7 @@ services:
     runtime: python
     plan: free
     rootDir: backend
-    buildCommand: pip install --upgrade pip && pip install -r ../requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: bash ./start.sh
     healthCheckPath: /health
     envVars:
