@@ -2,70 +2,91 @@
 <!--
   DAN Analytical brand mark — Arabic variant.
 
-  Same gold medallion as the English version (the medallion's "DAN" is a
-  fixed Latin emblem, language-neutral). The wordmark on the side
-  switches to "دان التحليلي" — the Arabic brand Loay uses — anchored to
-  the right edge of the wordmark area and flowing leftward (Arabic glyph
-  runs are RTL by default; we don't add direction="rtl" because that
-  combined with text-anchor="end" would push the text into the medallion).
+  Same lockup as the official EN logo (gold cursive D with ornamental
+  flourish + orange "RIsk" diamond inside the D's loop) but mirrored:
+  the gold D moves to the right, the tan panel sits on the left and
+  carries the Arabic wordmark "دان التحليلي" (Loay's chosen Arabic
+  brand). The medallion content "RIsk" stays Latin — it's a fixed
+  emblem the way the gold "D" is.
 
-  Loay's note: project named after his son Dan. Treat the logo with care.
+  When the official high-res asset is supplied, drop it under this same
+  filename and every header picks it up automatically.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="دان التحليلي">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 90" role="img" aria-label="دان التحليلي">
   <defs>
-    <linearGradient id="danGoldAr" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="goldDAr" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%"  stop-color="#f3d575" />
-      <stop offset="55%" stop-color="#d4a437" />
-      <stop offset="100%" stop-color="#a47820" />
+      <stop offset="50%" stop-color="#c89530" />
+      <stop offset="100%" stop-color="#7a5114" />
     </linearGradient>
-    <linearGradient id="danCreamAr" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"  stop-color="#fdf6dc" />
-      <stop offset="100%" stop-color="#f3e7b1" />
+    <linearGradient id="tanPanelAr" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"  stop-color="#ead8b6" />
+      <stop offset="100%" stop-color="#cdb88a" />
+    </linearGradient>
+    <linearGradient id="diamondOrangeAr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#ffb347" />
+      <stop offset="100%" stop-color="#d97a18" />
     </linearGradient>
   </defs>
 
-  <!-- Medallion on the RIGHT (mirrors the EN version's left-anchored
-       medallion so AR readers see the wordmark first). -->
-  <g transform="translate(200 40)">
-    <circle r="34" fill="url(#danGoldAr)" />
-    <circle r="28" fill="url(#danCreamAr)" stroke="#a47820" stroke-width="0.8" />
-    <text x="0" y="6"
-          font-family="Georgia, 'Times New Roman', serif"
-          font-size="22"
-          font-weight="700"
-          fill="#0c1a3c"
-          text-anchor="middle"
-          letter-spacing="0.5">DAN</text>
-    <text x="-12" y="-9"
-          font-family="Georgia, serif"
-          font-size="6"
-          font-weight="700"
-          fill="#a47820"
-          text-anchor="middle">★</text>
+  <!-- Tan/cream panel — left side of the lockup (mirrored vs EN). -->
+  <rect x="4" y="4" width="196" height="82" rx="3"
+        fill="url(#tanPanelAr)" stroke="#7a5114" stroke-width="0.5" />
+
+  <!-- Cursive D on the right, flipped horizontally so the ornate side
+       of the letter still faces outward. -->
+  <g transform="translate(280 0) scale(-1 1)">
+    <text x="6" y="68"
+          font-family="'Snell Roundhand', 'Brush Script MT', 'Lucida Calligraphy', 'Apple Chancery', Georgia, serif"
+          font-size="86"
+          font-weight="900"
+          font-style="italic"
+          fill="url(#goldDAr)"
+          stroke="#5a3f0e"
+          stroke-width="0.6"
+          paint-order="stroke fill">D</text>
+
+    <path d="M 14,72 C 4,82 0,90 18,89 C 40,88 60,82 58,70 C 50,75 30,77 18,72"
+          fill="url(#goldDAr)"
+          stroke="#5a3f0e"
+          stroke-width="0.5"
+          opacity="0.9" />
   </g>
 
-  <!-- Arabic wordmark anchored on the RIGHT edge of the wordmark area
-       (x=154), flowing leftward. No direction attribute — the browser
-       handles Arabic glyph order within each text run. Vertical sizes
-       match the EN version: 22 / 11 / 9. -->
-  <g transform="translate(0 0)">
-    <text x="154" y="36"
-          font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
-          font-size="22"
-          font-weight="800"
-          fill="#0c1a3c"
-          text-anchor="end">دان</text>
-    <text x="154" y="56"
-          font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
-          font-size="11"
-          font-weight="600"
-          fill="#1f3a73"
-          text-anchor="end">التحليلي</text>
-    <text x="154" y="70"
-          font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
+  <!-- "RIsk" diamond accent — anchored to the actual letter location
+       (mirrored x, so x=280-42=238). Text stays upright, not flipped. -->
+  <g transform="translate(238 42)">
+    <polygon points="0,-13 14,0 0,13 -14,0"
+             fill="url(#diamondOrangeAr)"
+             stroke="#5a3f0e"
+             stroke-width="0.8" />
+    <text x="0" y="3"
+          text-anchor="middle"
+          font-family="Georgia, 'Times New Roman', serif"
           font-size="9"
-          font-weight="500"
-          fill="#5b6f9a"
-          text-anchor="end">منصة المحفظة الاستثمارية</text>
+          font-weight="700"
+          fill="#0c1a3c">R<tspan font-style="italic">I</tspan>sk</text>
   </g>
+
+  <!-- Arabic wordmark on the tan panel. text-anchor='end' anchors the
+       text at the right edge of the panel so it flows leftward
+       naturally for RTL readers. -->
+  <text x="190" y="42"
+        font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
+        font-size="32"
+        font-weight="900"
+        fill="#0c1a3c"
+        text-anchor="end">دان</text>
+  <text x="190" y="62"
+        font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
+        font-size="14"
+        font-weight="700"
+        fill="#0c1a3c"
+        text-anchor="end">التحليلي</text>
+  <text x="190" y="78"
+        font-family="'IBM Plex Sans Arabic', 'Cairo', 'Tahoma', 'Arial', sans-serif"
+        font-size="9"
+        font-weight="600"
+        fill="#0c1a3c"
+        text-anchor="end">منصة المحفظة الاستثمارية</text>
 </svg>

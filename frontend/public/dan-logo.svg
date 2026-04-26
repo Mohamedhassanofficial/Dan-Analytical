@@ -1,65 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  DAN Analytical brand emblem.
+  DAN Analytical brand mark — English variant.
 
-  Loay named the project after his son Dan (10 yrs). The mark is a gold
-  medallion with a stylised "DAN" inside; the wordmark "ANALYTICAL
-  APPLICATIONS" curls beneath. Designed to render crisply at any size and
-  to live in the app's TopBar.
+  Recreated to match Loay's official logo: a gold cursive "D" with an
+  ornamental flourish on the left, an orange "RIsk" diamond accent inside
+  the loop of the D, and a tan/cream panel on the right carrying the
+  "DAN ANALYTICAL APPLICATIONS" wordmark.
+
+  When the official high-res asset is supplied, drop it under this same
+  filename — every header picks it up automatically.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="DAN Analytical Applications">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 90" role="img" aria-label="DAN Analytical Applications">
   <defs>
-    <linearGradient id="danGold" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="goldD" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%"  stop-color="#f3d575" />
-      <stop offset="55%" stop-color="#d4a437" />
-      <stop offset="100%" stop-color="#a47820" />
+      <stop offset="50%" stop-color="#c89530" />
+      <stop offset="100%" stop-color="#7a5114" />
     </linearGradient>
-    <linearGradient id="danCream" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"  stop-color="#fdf6dc" />
-      <stop offset="100%" stop-color="#f3e7b1" />
+    <linearGradient id="tanPanel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"  stop-color="#ead8b6" />
+      <stop offset="100%" stop-color="#cdb88a" />
+    </linearGradient>
+    <linearGradient id="diamondOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#ffb347" />
+      <stop offset="100%" stop-color="#d97a18" />
     </linearGradient>
   </defs>
 
-  <!-- Circular medallion -->
-  <g transform="translate(40 40)">
-    <circle r="34" fill="url(#danGold)" />
-    <circle r="28" fill="url(#danCream)" stroke="#a47820" stroke-width="0.8" />
-    <!-- "DAN" wordmark inside the medallion -->
-    <text x="0" y="6"
-          font-family="Georgia, 'Times New Roman', serif"
-          font-size="22"
-          font-weight="700"
-          fill="#0c1a3c"
+  <!-- Tan/cream panel — right side of the lockup -->
+  <rect x="80" y="4" width="196" height="82" rx="3"
+        fill="url(#tanPanel)" stroke="#7a5114" stroke-width="0.5" />
+
+  <!-- Cursive D in gold (italic serif gives the ornate Spencerian feel) -->
+  <text x="6" y="68"
+        font-family="'Snell Roundhand', 'Brush Script MT', 'Lucida Calligraphy', 'Apple Chancery', Georgia, serif"
+        font-size="86"
+        font-weight="900"
+        font-style="italic"
+        fill="url(#goldD)"
+        stroke="#5a3f0e"
+        stroke-width="0.6"
+        paint-order="stroke fill">D</text>
+
+  <!-- Decorative flourish swooping below the D — gold ribbon -->
+  <path d="M 14,72 C 4,82 0,90 18,89 C 40,88 60,82 58,70 C 50,75 30,77 18,72"
+        fill="url(#goldD)"
+        stroke="#5a3f0e"
+        stroke-width="0.5"
+        opacity="0.9" />
+
+  <!-- "RIsk" diamond accent inside the D loop -->
+  <g transform="translate(42 42)">
+    <polygon points="0,-13 14,0 0,13 -14,0"
+             fill="url(#diamondOrange)"
+             stroke="#5a3f0e"
+             stroke-width="0.8" />
+    <text x="0" y="3"
           text-anchor="middle"
-          letter-spacing="0.5">DAN</text>
-    <!-- subtle mark above the D, mirroring the seal feel -->
-    <text x="-12" y="-9"
-          font-family="Georgia, serif"
-          font-size="6"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="9"
           font-weight="700"
-          fill="#a47820"
-          text-anchor="middle">★</text>
+          fill="#0c1a3c">R<tspan font-style="italic">I</tspan>sk</text>
   </g>
 
-  <!-- Wordmark to the right of the medallion -->
-  <g transform="translate(86 0)">
-    <text x="0" y="36"
-          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
-          font-size="22"
-          font-weight="800"
-          fill="#0c1a3c"
-          letter-spacing="1.2">DAN</text>
-    <text x="0" y="56"
-          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
-          font-size="11"
-          font-weight="600"
-          fill="#1f3a73"
-          letter-spacing="2.5">ANALYTICAL</text>
-    <text x="0" y="70"
-          font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
-          font-size="9"
-          font-weight="500"
-          fill="#5b6f9a"
-          letter-spacing="2.5">APPLICATIONS</text>
-  </g>
+  <!-- Wordmark on the tan panel -->
+  <text x="100" y="42"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="34"
+        font-weight="900"
+        fill="#0c1a3c"
+        letter-spacing="3">DAN</text>
+  <text x="100" y="62"
+        font-family="'Helvetica Neue', Arial, sans-serif"
+        font-size="11"
+        font-weight="700"
+        fill="#0c1a3c"
+        letter-spacing="2.5">ANALYTICAL</text>
+  <text x="100" y="78"
+        font-family="'Helvetica Neue', Arial, sans-serif"
+        font-size="11"
+        font-weight="700"
+        fill="#0c1a3c"
+        letter-spacing="2.5">APPLICATIONS</text>
 </svg>
