@@ -252,6 +252,26 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
         "Pick the indicator you want to filter by — you can pick more than one at the same time.",
         "screener", None),
 
+    # ── Add-to-portfolio modal redesign (Loay slide 8) ──────────────────
+    ("screener.add_modal_subtitle",
+                                "اسم السهم",                          "Stock name",                   "screener", None),
+    ("screener.add_modal_field_stock",
+                                "السهم",                              "Stock",                        "screener", None),
+    ("screener.add_modal_field_portfolio",
+                                "اختر المحفظة",                       "Choose portfolio",             "screener", None),
+    ("screener.add_modal_portfolio_option",
+                                "{{name}}  مبلغ الاستثمار {{amount}}",
+                                "{{name}}  Investment {{amount}}",    "screener",
+                                "Keep {{name}} and {{amount}} placeholders."),
+    ("screener.add_modal_field_date",
+                                "تاريخ الشراء",                       "Purchase date",                "screener", None),
+    ("screener.add_modal_field_price",
+                                "سعر الشراء (﷼)",                     "Purchase price (SAR)",         "screener", None),
+    ("screener.add_modal_no_portfolios",
+                                "ليس لديك محافظ بعد. اضغط هنا لإنشاء محفظة جديدة.",
+                                "You don't have any portfolios yet. Click here to create one.",
+                                "screener", None),
+
     # ── Disclosure-date columns (Loay slide — Financial Ratios band) ───
     ("screener.col_balance_sheet_date",
                                   "آخر تحديث للميزانية العمومية",

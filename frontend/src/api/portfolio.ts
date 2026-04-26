@@ -88,6 +88,14 @@ export interface PortfolioRun {
 export interface PortfolioHolding {
   ticker: string;
   weight: number;
+  purchase_date: string | null;
+  purchase_price: number | null;
+}
+
+export interface AddHoldingPayload {
+  ticker: string;
+  purchase_date?: string;
+  purchase_price?: number;
 }
 
 export interface SavedPortfolio {
@@ -173,10 +181,10 @@ export const PortfolioAPI = {
     api<void>(`/portfolio/${id}`, { method: "DELETE" }),
 
   // Holdings (per-stock) + compute weights (closes the "active" loop)
-  addHolding: (id: number, ticker: string) =>
+  addHolding: (id: number, payload: AddHoldingPayload) =>
     api<SavedPortfolio>(`/portfolio/${id}/holdings`, {
       method: "POST",
-      body: { ticker },
+      body: payload,
     }),
 
   removeHolding: (id: number, ticker: string) =>

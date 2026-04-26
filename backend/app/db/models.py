@@ -320,6 +320,9 @@ class PortfolioHolding(Base, TimestampMixin):
 
     weight: Mapped[Decimal] = mapped_column(Numeric(10, 6), nullable=False)
     shares: Mapped[Decimal | None] = mapped_column(Numeric(18, 4))
+    # Slide-#8 capture: when the user bought this position, and at what price.
+    purchase_date: Mapped[date | None] = mapped_column(Date)
+    purchase_price: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
 
     portfolio: Mapped[Portfolio] = relationship(back_populates="holdings")
     stock: Mapped[Stock] = relationship()

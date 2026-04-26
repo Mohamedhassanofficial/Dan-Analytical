@@ -125,6 +125,8 @@ class MetricsResponse(BaseModel):
 class HoldingIn(BaseModel):
     ticker: str
     weight: float = Field(..., ge=0, le=1)
+    purchase_date: date | None = None
+    purchase_price: float | None = Field(None, ge=0)
 
 
 class SavePortfolio(BaseModel):
@@ -149,6 +151,10 @@ class UpdatePortfolioRequest(BaseModel):
 class AddHoldingRequest(BaseModel):
     """Add one stock to a portfolio's holdings (no weight — set via compute)."""
     ticker: str = Field(..., min_length=1, max_length=12)
+    # Slide-#8 capture. Both optional — if the user leaves them blank the
+    # backend defaults to today + the stock's `last_price` snapshot.
+    purchase_date: date | None = None
+    purchase_price: float | None = Field(None, ge=0)
 
 
 class ComputeWeightsRequest(BaseModel):

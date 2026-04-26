@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, BarChart3, Check, CheckCircle2, Filter, Plus, Search, Shield, X } from "lucide-react";
+import { ArrowLeft, BarChart3, Check, CheckCircle2, Filter, Plus, Search, Shield, X } from "lucide-react";
 import { StocksAPI, type StockRow } from "@/api/stocks";
 import { PortfolioAPI, type SavedPortfolio } from "@/api/portfolio";
 import { ApiError } from "@/api/client";
@@ -33,8 +33,6 @@ import { fmtNum, fmtPct } from "@/lib/format";
  * Numeric coloring: every numeric cell routes through `numToneClass()`:
  *   positive → text-ink, zero/negative → text-danger bold, null → text-muted.
  */
-
-const DRAFT_KEY = "tadawul.draft_portfolio";
 
 // ── Column definitions ──────────────────────────────────────────────────────
 // fmt: "num" = raw decimal, "pct" = decimal × 100 with %, "money" = 2-dp fixed
@@ -124,17 +122,6 @@ function passesFilter(row: StockRow, f: OpFilter): boolean {
   }
 }
 
-// ── localStorage draft portfolio ────────────────────────────────────────────
-function readDraft(): string[] {
-  try {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    return raw ? (JSON.parse(raw) as string[]) : [];
-  } catch { return []; }
-}
-function writeDraft(list: string[]): void {
-  localStorage.setItem(DRAFT_KEY, JSON.stringify(list));
-}
-
 // ────────────────────────────────────────────────────────────────────────────
 // Page
 // ────────────────────────────────────────────────────────────────────────────
@@ -158,8 +145,6 @@ export default function ScreenerPage() {
 
   const [riskModalOpen, setRiskModalOpen] = useState(false);
   const [financialModalOpen, setFinancialModalOpen] = useState(false);
-
-  const [draft, setDraft] = useState<string[]>(() => readDraft());
 
   // Portfolio-context mode (URL ?portfolio=<id>): fetch the portfolio so we
   // can show its name in the banner and use its current holdings as the
@@ -243,27 +228,13 @@ export default function ScreenerPage() {
     setFinancialFilters([]);
   }
 
-  function toggleDraft(symbol: string) {
-    const next = draft.includes(symbol)
-      ? draft.filter((s) => s !== symbol)
-      : [...draft, symbol];
-    setDraft(next);
-    writeDraft(next);
-  }
-
-  // Portfolio-context add/remove — talks to the backend directly instead of
-  // the localStorage draft. Keeps the row icon's state synchronised with the
-  // live portfolio.
-  async function togglePortfolioHolding(row: StockRow) {
-    if (portfolioIdNum === null) {
-      toggleDraft(row.symbol);
-      return;
-    }
+  // Remove a stock from the current portfolio-context portfolio. Used by the
+  // row's Check button when the stock is already in the active portfolio.
+  async function removeFromContextPortfolio(row: StockRow) {
+    if (portfolioIdNum === null) return;
     setAddingTicker(row.ticker_suffix);
     try {
-      const updated = inPortfolio.has(row.ticker_suffix)
-        ? await PortfolioAPI.removeHolding(portfolioIdNum, row.ticker_suffix)
-        : await PortfolioAPI.addHolding(portfolioIdNum, row.ticker_suffix);
+      const updated = await PortfolioAPI.removeHolding(portfolioIdNum, row.ticker_suffix);
       setPortfolio(updated);
     } catch (e) {
       setError(e instanceof ApiError ? e.detail : t("errors.network"));
@@ -272,29 +243,36 @@ export default function ScreenerPage() {
     }
   }
 
-  // Add button click — three branches:
-  //   - standalone (no ?portfolio=): toggle the localStorage draft, no modal
-  //   - portfolio-context, row already in portfolio: direct remove (no modal)
-  //   - portfolio-context, row not yet in portfolio: open slide-#7 modal
+  // Add button click. Slide-#8 redesign: ALWAYS open the modal (the modal's
+  // own portfolio dropdown handles the standalone case). The remove path
+  // stays click-through when the row is already in the active portfolio.
   function onAddClick(row: StockRow) {
-    if (portfolioIdNum === null) {
-      toggleDraft(row.symbol);
-      return;
-    }
-    if (inPortfolio.has(row.ticker_suffix)) {
-      void togglePortfolioHolding(row);
+    if (portfolioIdNum !== null && inPortfolio.has(row.ticker_suffix)) {
+      void removeFromContextPortfolio(row);
       return;
     }
     setAddPending(row);
   }
 
-  async function confirmAdd() {
-    if (!addPending || portfolioIdNum === null) return;
+  async function confirmAdd(args: {
+    portfolioId: number;
+    purchaseDate: string;
+    purchasePrice: number;
+  }) {
+    if (!addPending) return;
     const ticker = addPending.ticker_suffix;
     setAddingTicker(ticker);
     try {
-      const updated = await PortfolioAPI.addHolding(portfolioIdNum, ticker);
-      setPortfolio(updated);
+      const updated = await PortfolioAPI.addHolding(args.portfolioId, {
+        ticker,
+        purchase_date: args.purchaseDate,
+        purchase_price: args.purchasePrice,
+      });
+      // If the user added to the URL-context portfolio, refresh local state;
+      // otherwise just close — the user can navigate to /portfolios to see it.
+      if (portfolioIdNum === args.portfolioId) {
+        setPortfolio(updated);
+      }
       setAddedTicker(ticker);
       setAddPending(null);
     } catch (e) {
@@ -423,21 +401,6 @@ export default function ScreenerPage() {
         </div>
       )}
 
-      {/* Draft portfolio summary */}
-      {draft.length > 0 && (
-        <div className="card flex items-center justify-between border-brand-300 bg-brand-50 p-3">
-          <div className="text-sm text-brand-900">
-            {label("screener.draft_summary", { n: draft.length })}
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {draft.slice(0, 10).map((s) => (
-              <span key={s} className="badge-info">{s}</span>
-            ))}
-            {draft.length > 10 && <span className="badge-info">+{draft.length - 10}</span>}
-          </div>
-        </div>
-      )}
-
       {/* Table */}
       <div className="card p-0 overflow-hidden">
         <div className="relative max-h-[75vh] overflow-auto">
@@ -484,9 +447,8 @@ export default function ScreenerPage() {
 
             <tbody>
               {filtered.map((r) => {
-                const isAdded = portfolioIdNum !== null
-                  ? inPortfolio.has(r.ticker_suffix)
-                  : draft.includes(r.symbol);
+                const isAdded =
+                  portfolioIdNum !== null && inPortfolio.has(r.ticker_suffix);
                 return (
                   <tr key={r.symbol} className="screener-row-hover border-b border-brand-100">
                     <TdSticky colIndex={0} className="font-mono font-semibold">
@@ -613,14 +575,14 @@ export default function ScreenerPage() {
         onClose={() => setFinancialModalOpen(false)}
       />
 
-      {/* Slide-#7 Add modal */}
-      {addPending && portfolio && (
+      {/* Slide-#8 Add modal — portfolio dropdown + purchase date + price */}
+      {addPending && (
         <AddToPortfolioModal
           row={addPending}
-          portfolio={portfolio}
           stockName={displayName(addPending)}
+          defaultPortfolioId={portfolioIdNum}
           submitting={addingTicker === addPending.ticker_suffix}
-          onConfirm={() => void confirmAdd()}
+          onConfirm={(args) => void confirmAdd(args)}
           onClose={() => setAddPending(null)}
         />
       )}
@@ -629,23 +591,49 @@ export default function ScreenerPage() {
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
-/* Slide-#7 "Add to portfolio" modal                                          */
+/* Slide-#8 "Add to portfolio" modal                                          */
 /* ────────────────────────────────────────────────────────────────────────── */
 interface AddModalProps {
   row: StockRow;
-  portfolio: SavedPortfolio;
   stockName: string;
+  defaultPortfolioId: number | null;
   submitting: boolean;
-  onConfirm: () => void;
+  onConfirm: (args: { portfolioId: number; purchaseDate: string; purchasePrice: number }) => void;
   onClose: () => void;
 }
 
 function AddToPortfolioModal({
-  row, portfolio, stockName, submitting, onConfirm, onClose,
+  row, stockName, defaultPortfolioId, submitting, onConfirm, onClose,
 }: AddModalProps) {
   const { t } = useTranslation();
   const label = useLabel();
   const { locale } = useLocale();
+  const navigate = useNavigate();
+
+  const [portfolios, setPortfolios] = useState<SavedPortfolio[] | null>(null);
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(defaultPortfolioId);
+  const today = new Date().toISOString().slice(0, 10);
+  const [purchaseDate, setPurchaseDate] = useState<string>(today);
+  const [purchasePrice, setPurchasePrice] = useState<string>(
+    row.last_price !== null ? String(row.last_price) : "",
+  );
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Pull every saved portfolio so the dropdown is ready.
+  useEffect(() => {
+    PortfolioAPI.listSaved()
+      .then((list) => {
+        setPortfolios(list);
+        if (selectedPortfolioId === null && list.length > 0) {
+          setSelectedPortfolioId(list[0].id);
+        }
+      })
+      .catch((e: unknown) => {
+        setLoadError(e instanceof ApiError ? e.detail : t("errors.network"));
+        setPortfolios([]);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const moneyFmt = useMemo(
     () =>
@@ -656,9 +644,19 @@ function AddToPortfolioModal({
       }),
     [locale],
   );
-  const amountText = portfolio.initial_capital
-    ? moneyFmt.format(portfolio.initial_capital)
-    : "—";
+
+  function submit() {
+    if (!selectedPortfolioId) return;
+    const price = Number(purchasePrice);
+    if (!purchaseDate || !Number.isFinite(price) || price < 0) return;
+    onConfirm({
+      portfolioId: selectedPortfolioId,
+      purchaseDate,
+      purchasePrice: price,
+    });
+  }
+
+  const noPortfolios = portfolios !== null && portfolios.length === 0;
 
   return (
     <div
@@ -669,50 +667,95 @@ function AddToPortfolioModal({
         className="w-full max-w-md rounded-xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-brand-100 px-5 py-4">
-          <h2 className="text-lg font-semibold text-brand-900">
-            {label("screener.add_modal_title")}
-          </h2>
+        {/* Header */}
+        <div className="flex items-start justify-between border-b border-brand-100 px-5 py-3">
+          <div className="leading-tight">
+            <h2 className="text-base font-semibold text-brand-900">
+              {label("screener.add_modal_title")}
+            </h2>
+            <p className="mt-0.5 text-xs text-muted">
+              {label("screener.add_modal_subtitle")}
+            </p>
+          </div>
           <button onClick={onClose} className="btn-ghost p-1" aria-label="close">
             <X size={18} />
           </button>
         </div>
 
-        <div className="flex flex-col gap-4 px-5 py-4 text-sm">
-          <div className="rounded-lg border border-brand-200 bg-brand-50 p-3">
-            <div className="text-xs font-medium uppercase tracking-wide text-muted">
-              {label("screener.add_modal_stock")}
-            </div>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="font-mono text-base font-semibold text-brand-900">
-                {row.ticker_suffix}
-              </span>
-              <span className="text-brand-900">— {stockName}</span>
-            </div>
-            {row.sector_code && (
-              <div className="mt-1 text-xs text-muted">{row.sector_code}</div>
+        {/* Body */}
+        <div className="flex flex-col gap-3 px-5 py-4 text-sm">
+          {/* Stock (read-only) */}
+          <div>
+            <label className="label">{label("screener.add_modal_field_stock")}</label>
+            <input
+              className="input bg-brand-50 font-medium text-brand-900"
+              value={`${row.ticker_suffix} — ${stockName}`}
+              readOnly
+              tabIndex={-1}
+            />
+          </div>
+
+          {/* Portfolio dropdown */}
+          <div>
+            <label className="label">{label("screener.add_modal_field_portfolio")}</label>
+            {loadError && <div className="badge-error w-fit">{loadError}</div>}
+            {noPortfolios ? (
+              <button
+                type="button"
+                className="btn-secondary w-full justify-start"
+                onClick={() => navigate("/portfolios")}
+              >
+                {label("screener.add_modal_no_portfolios")}
+              </button>
+            ) : (
+              <select
+                className="input"
+                value={selectedPortfolioId ?? ""}
+                onChange={(e) => setSelectedPortfolioId(Number(e.target.value))}
+                disabled={portfolios === null}
+              >
+                {portfolios?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {label("screener.add_modal_portfolio_option", {
+                      name: p.name,
+                      amount: p.initial_capital
+                        ? moneyFmt.format(p.initial_capital)
+                        : "—",
+                    })}
+                  </option>
+                ))}
+              </select>
             )}
           </div>
 
-          <div className="rounded-lg border border-brand-200 bg-brand-50 p-3">
-            <div className="text-xs font-medium uppercase tracking-wide text-muted">
-              {label("screener.add_modal_portfolio")}
-            </div>
-            <div className="mt-1 font-semibold text-brand-900">{portfolio.name}</div>
-            <div className="mt-1 text-xs text-muted">
-              {label("screener.add_modal_holdings", {
-                n: portfolio.holding_count,
-                amount: amountText,
-              })}
-            </div>
+          {/* Purchase date */}
+          <div>
+            <label className="label">{label("screener.add_modal_field_date")}</label>
+            <input
+              type="date"
+              className="input"
+              value={purchaseDate}
+              onChange={(e) => setPurchaseDate(e.target.value)}
+              max={today}
+            />
           </div>
 
-          <div className="flex items-start gap-2 rounded-lg border border-brand-300 bg-brand-100 p-3 text-xs text-brand-900">
-            <AlertTriangle size={16} className="mt-0.5 flex-none text-brand-700" />
-            <span>{label("screener.add_modal_weight_notice")}</span>
+          {/* Purchase price */}
+          <div>
+            <label className="label">{label("screener.add_modal_field_price")}</label>
+            <input
+              type="number"
+              step="0.01"
+              min={0}
+              className="input"
+              value={purchasePrice}
+              onChange={(e) => setPurchasePrice(e.target.value)}
+              placeholder={row.last_price !== null ? String(row.last_price) : ""}
+            />
           </div>
         </div>
 
+        {/* Footer */}
         <div className="flex justify-end gap-2 border-t border-brand-100 px-5 py-3">
           <button type="button" className="btn-ghost" onClick={onClose}>
             {label("screener.add_modal_cancel")}
@@ -720,8 +763,14 @@ function AddToPortfolioModal({
           <button
             type="button"
             className="btn-primary"
-            onClick={onConfirm}
-            disabled={submitting}
+            onClick={submit}
+            disabled={
+              submitting ||
+              !selectedPortfolioId ||
+              !purchaseDate ||
+              !Number.isFinite(Number(purchasePrice)) ||
+              Number(purchasePrice) < 0
+            }
           >
             {submitting ? t("common.loading") : label("screener.add_modal_confirm")}
           </button>

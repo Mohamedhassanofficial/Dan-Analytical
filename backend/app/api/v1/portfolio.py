@@ -8,7 +8,7 @@ Every successful optimization is recorded in `portfolio_runs` for audit.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
 
@@ -583,11 +583,23 @@ def add_holding(
             PortfolioHolding.stock_id == stock.id,
         )
     ).scalar_one_or_none()
+    # Slide-#8 capture: default purchase_date to today and purchase_price to
+    # the stock's last price snapshot when the caller omits them.
+    purchase_date = payload.purchase_date or date.today()
+    if payload.purchase_price is not None:
+        purchase_price = Decimal(str(payload.purchase_price))
+    elif stock.last_price is not None:
+        purchase_price = stock.last_price
+    else:
+        purchase_price = None
+
     if existing is None:
         db.add(PortfolioHolding(
             portfolio_id=p.id,
             stock_id=stock.id,
             weight=Decimal("0"),
+            purchase_date=purchase_date,
+            purchase_price=purchase_price,
         ))
         # Adding a stock invalidates any previously-computed weights — we
         # drop them back to 0 so the portfolio flips to "inactive" until
@@ -598,6 +610,13 @@ def add_holding(
             .where(PortfolioHolding.portfolio_id == p.id)
             .values(weight=Decimal("0"))
         )
+    else:
+        # Holding already exists — refresh the purchase metadata if the
+        # caller passed it explicitly (covers the "I bought more" case).
+        if payload.purchase_date is not None:
+            existing.purchase_date = purchase_date
+        if payload.purchase_price is not None:
+            existing.purchase_price = purchase_price
 
     db.add(AuditLog(
         user_id=user.id,
@@ -827,7 +846,13 @@ def _portfolio_out(
         .where(PortfolioHolding.portfolio_id == p.id)
     ).all()
     holdings_out = [
-        HoldingIn(ticker=ticker, weight=float(h.weight)) for h, ticker in rows
+        HoldingIn(
+            ticker=ticker,
+            weight=float(h.weight),
+            purchase_date=h.purchase_date,
+            purchase_price=float(h.purchase_price) if h.purchase_price is not None else None,
+        )
+        for h, ticker in rows
     ]
 
     # Loay's definition (slide 1): "Active" iff user has picked stocks AND
