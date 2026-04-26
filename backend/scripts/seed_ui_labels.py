@@ -237,6 +237,9 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
     ("sector_avg.btn_risk",     "متوسطات مؤشرات المخاطر",             "Risk Indicator Averages",      "sector_avg", None),
     ("sector_avg.btn_financial","متوسطات المؤشرات المالية",           "Financial Indicator Averages", "sector_avg", None),
     ("sector_avg.refresh",      "تحديث",                              "Refresh",                      "sector_avg", None),
+    ("sector_avg.title_bar",    "احتساب متوسط أداء القطاع الصناعي",   "Industry Sector Performance Averages", "sector_avg", None),
+    ("sector_avg.btn_calculate","احتساب",                             "Calculate",                    "sector_avg", None),
+    ("sector_avg.count_chip",   "{{name}} – عددها {{n}}",             "{{name}} – {{n}} stocks",      "sector_avg", "Keep {{name}} and {{n}} placeholders."),
 
     # ── Disclosure-date columns (Loay slide — Financial Ratios band) ───
     ("screener.col_balance_sheet_date",

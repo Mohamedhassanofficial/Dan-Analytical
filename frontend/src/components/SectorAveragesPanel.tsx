@@ -108,115 +108,114 @@ export default function SectorAveragesPanel() {
       ? `${s.sector_name_ar} — ${label("sector_avg.count_suffix", { n: s.stock_count })}`
       : `${s.sector_name_en} — ${s.stock_count} stocks`;
 
-  const sectorBanner = useMemo(() => {
-    if (!averages) return null;
-    const name = locale === "ar" ? averages.sector_name_ar : averages.sector_name_en;
-    return `${name} — ${label("sector_avg.count_suffix", { n: averages.stock_count })}`;
-  }, [averages, locale, label]);
+  // Selected sector's name + count, formatted for the chip beside the
+  // CTA buttons (slide 4: "البنوك – عددها 21").
+  const sectorChip = useMemo(() => {
+    const sel = sectors.find((s) => s.sector_code === selectedSector);
+    if (!sel) return null;
+    return label("sector_avg.count_chip", {
+      name: locale === "ar" ? sel.sector_name_ar : sel.sector_name_en,
+      n: sel.stock_count,
+    });
+  }, [sectors, selectedSector, locale, label]);
 
   return (
-    <div className="card flex flex-col gap-3 p-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-semibold text-brand-900">
-          {label("sector_avg.title")}
-        </span>
-        <span className="text-xs text-muted">{label("sector_avg.subtitle")}</span>
+    <div className="card flex flex-col overflow-hidden p-0">
+      {/* Title bar — slide 4: brand-700 band with the screen heading. */}
+      <div className="bg-brand-700 px-4 py-2 text-center text-sm font-semibold text-white">
+        {label("sector_avg.title_bar")}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <select
-          className="input w-72"
-          value={selectedSector}
-          onChange={(e) => pickSector(e.target.value)}
-        >
-          <option value="">{label("sector_avg.pick_sector")}</option>
-          {sectors.map((s) => (
-            <option key={s.sector_code} value={s.sector_code}>
-              {sectorLabel(s)}
-            </option>
-          ))}
-        </select>
-
-        <button
-          className={
-            group === "risk"
-              ? "btn-primary"
-              : "btn-secondary"
-          }
-          onClick={() => pickGroup("risk")}
-          disabled={!selectedSector}
-        >
-          <Shield size={14} />
-          {label("sector_avg.btn_risk")}
-        </button>
-
-        <button
-          className={
-            group === "financial"
-              ? "btn-primary"
-              : "btn-secondary"
-          }
-          onClick={() => pickGroup("financial")}
-          disabled={!selectedSector}
-        >
-          <Filter size={14} />
-          {label("sector_avg.btn_financial")}
-        </button>
-
-        {selectedSector && group && (
-          <button
-            className="btn-ghost"
-            onClick={() => fetchAverages(selectedSector)}
-            disabled={loading}
-            title={label("sector_avg.refresh")}
+      <div className="flex flex-col gap-3 p-3">
+        {/* Picker row + CTA buttons + Calculate */}
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            className="input w-72"
+            value={selectedSector}
+            onChange={(e) => pickSector(e.target.value)}
           >
-            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            <option value="">{label("sector_avg.pick_sector")}</option>
+            {sectors.map((s) => (
+              <option key={s.sector_code} value={s.sector_code}>
+                {sectorLabel(s)}
+              </option>
+            ))}
+          </select>
+
+          {sectorChip && (
+            <span className="badge-info">{sectorChip}</span>
+          )}
+
+          <button
+            className={group === "risk" ? "btn-primary" : "btn-secondary"}
+            onClick={() => pickGroup("risk")}
+            disabled={!selectedSector}
+          >
+            <Shield size={14} />
+            {label("sector_avg.btn_risk")}
           </button>
+
+          <button
+            className={group === "financial" ? "btn-primary" : "btn-secondary"}
+            onClick={() => pickGroup("financial")}
+            disabled={!selectedSector}
+          >
+            <Filter size={14} />
+            {label("sector_avg.btn_financial")}
+          </button>
+
+          {selectedSector && group && (
+            <button
+              className="btn-primary"
+              onClick={() => fetchAverages(selectedSector)}
+              disabled={loading}
+              title={label("sector_avg.refresh")}
+            >
+              <Calculator size={14} />
+              {label("sector_avg.btn_calculate")}
+              {loading && <RefreshCw size={12} className="ms-1 animate-spin" />}
+            </button>
+          )}
+        </div>
+
+        {error && <div className="badge-error w-fit">{error}</div>}
+
+        {averages && group && (
+          <div className="rounded-lg border border-brand-200 bg-brand-50 p-3">
+            {group === "risk" && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                <Card labelKey="screener.col_var_1d" value={averages.avg_var_95_daily} fmt="pct" />
+                <Card labelKey="screener.col_sharp" value={averages.avg_sharp_ratio} fmt="num" />
+                <Card labelKey="screener.col_beta" value={averages.avg_beta} fmt="num" />
+                <Card labelKey="screener.col_daily_vol" value={averages.avg_daily_volatility} fmt="pct" />
+                <Card labelKey="screener.col_annual_vol" value={averages.avg_annual_volatility} fmt="pct" />
+                <RankingCard
+                  labelKey="screener.col_risk_rank"
+                  ranking={averages.risk_ranking}
+                  rankingLabel={
+                    averages.risk_ranking
+                      ? label(`ranking.${rankingKey(averages.risk_ranking)}`)
+                      : "—"
+                  }
+                />
+              </div>
+            )}
+
+            {group === "financial" && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+                <Card labelKey="screener.col_pe" value={averages.avg_pe_ratio} fmt="num" digits={2} />
+                <Card labelKey="screener.col_roe" value={averages.avg_roe} fmt="pct" />
+                <Card labelKey="screener.col_leverage" value={averages.avg_leverage_ratio} fmt="num" digits={2} />
+                <Card labelKey="screener.col_fcf" value={averages.avg_fcf_yield} fmt="pct" />
+                <Card labelKey="screener.col_mb" value={averages.avg_market_to_book} fmt="num" digits={2} />
+                <Card labelKey="screener.col_eps" value={averages.avg_eps} fmt="num" digits={2} />
+                <Card labelKey="screener.col_div_yield" value={averages.avg_dividend_yield} fmt="pct" />
+                <Card labelKey="screener.col_div_rate" value={averages.avg_annual_dividend_rate} fmt="num" digits={2} />
+              </div>
+            )}
+          </div>
         )}
       </div>
-
-      {error && <div className="badge-error w-fit">{error}</div>}
-
-      {averages && group && (
-        <>
-          <div className="text-xs text-brand-700">
-            <Calculator size={12} className="inline-block me-1" />
-            {sectorBanner}
-          </div>
-
-          {group === "risk" && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              <Card labelKey="screener.col_var_1d" value={averages.avg_var_95_daily} fmt="pct" />
-              <Card labelKey="screener.col_sharp" value={averages.avg_sharp_ratio} fmt="num" />
-              <Card labelKey="screener.col_beta" value={averages.avg_beta} fmt="num" />
-              <Card labelKey="screener.col_daily_vol" value={averages.avg_daily_volatility} fmt="pct" />
-              <Card labelKey="screener.col_annual_vol" value={averages.avg_annual_volatility} fmt="pct" />
-              <RankingCard
-                labelKey="screener.col_risk_rank"
-                ranking={averages.risk_ranking}
-                rankingLabel={
-                  averages.risk_ranking
-                    ? label(`ranking.${rankingKey(averages.risk_ranking)}`)
-                    : "—"
-                }
-              />
-            </div>
-          )}
-
-          {group === "financial" && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-              <Card labelKey="screener.col_pe" value={averages.avg_pe_ratio} fmt="num" digits={2} />
-              <Card labelKey="screener.col_roe" value={averages.avg_roe} fmt="pct" />
-              <Card labelKey="screener.col_leverage" value={averages.avg_leverage_ratio} fmt="num" digits={2} />
-              <Card labelKey="screener.col_fcf" value={averages.avg_fcf_yield} fmt="pct" />
-              <Card labelKey="screener.col_mb" value={averages.avg_market_to_book} fmt="num" digits={2} />
-              <Card labelKey="screener.col_eps" value={averages.avg_eps} fmt="num" digits={2} />
-              <Card labelKey="screener.col_div_yield" value={averages.avg_dividend_yield} fmt="pct" />
-              <Card labelKey="screener.col_div_rate" value={averages.avg_annual_dividend_rate} fmt="num" digits={2} />
-            </div>
-          )}
-        </>
-      )}
     </div>
   );
 }
