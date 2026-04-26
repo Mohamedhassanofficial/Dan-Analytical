@@ -409,8 +409,8 @@ export default function ScreenerPage() {
               <tr>
                 <ThSticky colIndex={0}>{label("screener.col_symbol")}</ThSticky>
                 <ThSticky colIndex={1}>{label("screener.col_name")}</ThSticky>
-                <Th>{label("screener.col_sector")}</Th>
-                <Th>{label("screener.col_industry")}</Th>
+                <Th minWidth="8rem">{label("screener.col_sector")}</Th>
+                <Th minWidth="16rem">{label("screener.col_industry")}</Th>
                 {RISK_COLS.map((c) => (
                   <Th key={c.key as string}>
                     <span className="inline-flex items-center gap-1.5">
@@ -805,9 +805,19 @@ function stickyStyle(colIndex: number, end: boolean): React.CSSProperties {
   return { insetInlineStart: STICKY_OFFSETS[colIndex] ?? "0px" };
 }
 
-function Th({ children }: { children?: React.ReactNode }) {
+function Th({
+  children,
+  minWidth,
+}: {
+  children?: React.ReactNode;
+  /** Optional column min-width (e.g. "14rem") to keep wide text readable. */
+  minWidth?: string;
+}) {
   return (
-    <th className="screener-th sticky top-0 z-20 text-start">
+    <th
+      className="screener-th sticky top-0 z-20 text-start"
+      style={minWidth ? { minWidth } : undefined}
+    >
       {children}
     </th>
   );
