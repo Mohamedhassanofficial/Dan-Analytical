@@ -215,6 +215,199 @@ def _sample(rng: np.random.Generator, profile: dict, key: str) -> float:
     return float(rng.uniform(lo, hi))
 
 
+# ── Extended ratios (Loay slide 79) ─────────────────────────────────────────
+# Generic baseline that fits a typical Saudi industrial firm. Per-sector
+# overrides below capture the cases where reality diverges materially —
+# banks have no inventory, retailers turn inventory 8-12×/yr, REITs have
+# almost zero turnover, etc.
+EXTRAS_DEFAULT = {
+    # Liquidity
+    "current_ratio":           (1.10, 2.20),
+    "quick_ratio":             (0.70, 1.60),
+    "cash_ratio":              (0.20, 0.80),
+    "interest_coverage_ratio": (3.0, 12.0),
+    # Efficiency
+    "asset_turnover":          (0.40, 1.20),
+    "inventory_turnover":      (3.0, 8.0),
+    "receivables_turnover":    (4.0, 10.0),
+    "payables_turnover":       (4.0, 9.0),
+    # Profitability
+    "roa":                     (0.04, 0.12),
+    "net_profit_margin":       (0.06, 0.18),
+    "gross_profit_margin":     (0.20, 0.45),
+    # Per-Share
+    "book_value_per_share":    (8.0, 35.0),
+    "revenue_per_share":       (5.0, 50.0),
+    # Shariah
+    "debt_to_market_cap":      (0.05, 0.30),
+    "cash_to_assets":          (0.05, 0.20),
+    "receivables_to_assets":   (0.10, 0.30),
+}
+
+EXTRAS_BY_SECTOR: dict[str, dict[str, tuple[float, float]]] = {
+    "TBNI": {  # Banks have no inventory; "current_ratio" doesn't apply the
+        "current_ratio":         (0.90, 1.20),
+        "quick_ratio":           (0.85, 1.15),
+        "cash_ratio":            (0.10, 0.30),
+        "asset_turnover":        (0.04, 0.08),
+        "inventory_turnover":    (0.0, 0.0),
+        "receivables_turnover":  (0.30, 0.80),
+        "payables_turnover":     (0.50, 1.20),
+        "interest_coverage_ratio": (1.5, 4.5),
+        "roa":                   (0.012, 0.022),
+        "net_profit_margin":     (0.30, 0.50),
+        "gross_profit_margin":   (0.55, 0.80),
+        "book_value_per_share":  (15.0, 30.0),
+        "revenue_per_share":     (3.0, 12.0),
+        "debt_to_market_cap":    (0.50, 1.20),
+        "cash_to_assets":        (0.05, 0.18),
+        "receivables_to_assets": (0.55, 0.80),
+    },
+    "TTSI": {  # Telecom — heavy assets, recurring billing
+        "asset_turnover":        (0.40, 0.65),
+        "inventory_turnover":    (8.0, 18.0),
+        "net_profit_margin":     (0.10, 0.20),
+        "gross_profit_margin":   (0.45, 0.65),
+        "interest_coverage_ratio": (5.0, 12.0),
+        "current_ratio":         (0.80, 1.40),
+    },
+    "TUTI": {  # Utilities — capital-heavy, regulated
+        "asset_turnover":        (0.20, 0.45),
+        "inventory_turnover":    (5.0, 12.0),
+        "net_profit_margin":     (0.05, 0.12),
+        "gross_profit_margin":   (0.20, 0.35),
+        "interest_coverage_ratio": (2.0, 5.0),
+        "current_ratio":         (0.70, 1.30),
+    },
+    "TENI": {  # Energy
+        "asset_turnover":        (0.50, 1.20),
+        "inventory_turnover":    (6.0, 14.0),
+        "net_profit_margin":     (0.10, 0.30),
+        "gross_profit_margin":   (0.25, 0.55),
+        "interest_coverage_ratio": (8.0, 25.0),
+        "current_ratio":         (1.20, 2.50),
+    },
+    "TFBI": {  # Food & Beverages
+        "asset_turnover":        (0.80, 1.50),
+        "inventory_turnover":    (5.0, 10.0),
+        "net_profit_margin":     (0.06, 0.15),
+        "gross_profit_margin":   (0.25, 0.45),
+    },
+    "TFSI": {  # Food & Staples Retailing — high inventory turnover, thin margins
+        "asset_turnover":        (1.50, 3.00),
+        "inventory_turnover":    (8.0, 14.0),
+        "net_profit_margin":     (0.02, 0.06),
+        "gross_profit_margin":   (0.18, 0.28),
+    },
+    "TCGI": {  # Consumer Durables / Apparel — high inventory turnover
+        "asset_turnover":        (1.00, 2.20),
+        "inventory_turnover":    (4.0, 9.0),
+        "net_profit_margin":     (0.06, 0.14),
+        "gross_profit_margin":   (0.30, 0.45),
+    },
+    "TCPI": {  # Consumer Services
+        "asset_turnover":        (1.10, 2.30),
+        "inventory_turnover":    (10.0, 25.0),
+        "net_profit_margin":     (0.06, 0.14),
+        "gross_profit_margin":   (0.30, 0.50),
+    },
+    "TMTI": {  # Materials — moderate turnover, cyclical margins
+        "asset_turnover":        (0.50, 1.20),
+        "inventory_turnover":    (4.0, 9.0),
+        "net_profit_margin":     (0.06, 0.18),
+        "gross_profit_margin":   (0.22, 0.40),
+    },
+    "TCSI": {  # Capital Goods
+        "asset_turnover":        (0.60, 1.20),
+        "inventory_turnover":    (3.0, 7.0),
+        "net_profit_margin":     (0.04, 0.12),
+        "gross_profit_margin":   (0.18, 0.32),
+    },
+    "TRTI": {  # Transportation
+        "asset_turnover":        (0.45, 1.00),
+        "inventory_turnover":    (10.0, 25.0),
+        "net_profit_margin":     (0.05, 0.14),
+        "gross_profit_margin":   (0.22, 0.38),
+    },
+    "TISI": {  # Insurance
+        "asset_turnover":        (0.20, 0.45),
+        "inventory_turnover":    (0.0, 0.0),
+        "current_ratio":         (1.05, 1.80),
+        "net_profit_margin":     (0.04, 0.12),
+        "gross_profit_margin":   (0.10, 0.25),
+        "debt_to_market_cap":    (0.10, 0.40),
+        "receivables_to_assets": (0.30, 0.55),
+    },
+    "TDFI": {  # Diversified Financials
+        "asset_turnover":        (0.10, 0.30),
+        "inventory_turnover":    (0.0, 0.0),
+        "net_profit_margin":     (0.20, 0.45),
+        "gross_profit_margin":   (0.50, 0.80),
+        "debt_to_market_cap":    (0.30, 1.10),
+    },
+    "TRMI": {  # Real Estate Management & Development
+        "asset_turnover":        (0.15, 0.45),
+        "inventory_turnover":    (0.5, 2.5),
+        "net_profit_margin":     (0.10, 0.30),
+        "gross_profit_margin":   (0.30, 0.55),
+        "current_ratio":         (1.20, 3.50),
+    },
+    "TRLI": {  # REITs — distribute income; very low inventory turnover
+        "asset_turnover":        (0.08, 0.18),
+        "inventory_turnover":    (0.0, 0.0),
+        "net_profit_margin":     (0.30, 0.65),
+        "gross_profit_margin":   (0.55, 0.85),
+        "current_ratio":         (0.90, 1.50),
+    },
+    "TPBI": {  # Pharma — high gross margins, modest inventory turnover
+        "asset_turnover":        (0.45, 0.85),
+        "inventory_turnover":    (3.0, 6.0),
+        "net_profit_margin":     (0.12, 0.28),
+        "gross_profit_margin":   (0.45, 0.70),
+    },
+    "TDAI": {  # Healthcare equipment / providers
+        "asset_turnover":        (0.50, 1.10),
+        "inventory_turnover":    (4.0, 9.0),
+        "net_profit_margin":     (0.10, 0.22),
+        "gross_profit_margin":   (0.30, 0.55),
+    },
+    "THEI": {  # Healthcare alt code
+        "asset_turnover":        (0.50, 1.10),
+        "inventory_turnover":    (4.0, 9.0),
+        "net_profit_margin":     (0.10, 0.22),
+        "gross_profit_margin":   (0.30, 0.55),
+    },
+    "TSSI": {  # Software & Services — high gross margin, no inventory
+        "asset_turnover":        (0.50, 1.10),
+        "inventory_turnover":    (0.0, 0.0),
+        "net_profit_margin":     (0.15, 0.32),
+        "gross_profit_margin":   (0.55, 0.82),
+        "current_ratio":         (1.50, 3.50),
+    },
+    "TMDI": {  # Media
+        "asset_turnover":        (0.50, 1.10),
+        "inventory_turnover":    (5.0, 12.0),
+        "net_profit_margin":     (0.06, 0.18),
+        "gross_profit_margin":   (0.30, 0.55),
+    },
+    "TTNI": {  # Tech Hardware
+        "asset_turnover":        (0.80, 1.50),
+        "inventory_turnover":    (4.0, 9.0),
+        "net_profit_margin":     (0.06, 0.16),
+        "gross_profit_margin":   (0.20, 0.40),
+    },
+}
+
+
+def _sample_extra(rng: np.random.Generator, sector_code: str | None, key: str) -> float:
+    """Sample an extended ratio; sector overrides win over EXTRAS_DEFAULT."""
+    sector = EXTRAS_BY_SECTOR.get(sector_code or "", {})
+    lo, hi = sector.get(key, EXTRAS_DEFAULT[key])
+    if lo == hi:
+        return float(lo)
+    return float(rng.uniform(lo, hi))
+
+
 def seed() -> int:
     today = date.today()
     now = datetime.now(timezone.utc)
@@ -275,6 +468,33 @@ def seed() -> int:
             s.last_price_date = today
             s.risk_ranking = compute_risk_ranking(s.annual_volatility)
             s.last_analytics_refresh = now
+
+            # Extended ratios (Loay slide 79). Sampled from EXTRAS_BY_SECTOR
+            # with EXTRAS_DEFAULT fallback. Per-share values use last_price as
+            # an anchor so BVPS / RPS scale with the stock instead of being
+            # nonsensical absolute numbers.
+            s.current_ratio = Decimal(str(round(_sample_extra(rng, sector_code, "current_ratio"), 4)))
+            s.quick_ratio = Decimal(str(round(_sample_extra(rng, sector_code, "quick_ratio"), 4)))
+            s.cash_ratio = Decimal(str(round(_sample_extra(rng, sector_code, "cash_ratio"), 4)))
+            s.interest_coverage_ratio = Decimal(str(round(_sample_extra(rng, sector_code, "interest_coverage_ratio"), 4)))
+            s.asset_turnover = Decimal(str(round(_sample_extra(rng, sector_code, "asset_turnover"), 4)))
+            s.inventory_turnover = Decimal(str(round(_sample_extra(rng, sector_code, "inventory_turnover"), 4)))
+            s.receivables_turnover = Decimal(str(round(_sample_extra(rng, sector_code, "receivables_turnover"), 4)))
+            s.payables_turnover = Decimal(str(round(_sample_extra(rng, sector_code, "payables_turnover"), 4)))
+            s.roa = Decimal(str(round(_sample_extra(rng, sector_code, "roa"), 6)))
+            s.net_profit_margin = Decimal(str(round(_sample_extra(rng, sector_code, "net_profit_margin"), 6)))
+            s.gross_profit_margin = Decimal(str(round(_sample_extra(rng, sector_code, "gross_profit_margin"), 6)))
+            # Per-share values anchored to last_price for visual coherence:
+            # BVPS = price ÷ M/B (so a 100 SAR stock at M/B=2 has BVPS=50)
+            # RPS  = price × revenue/asset proxy (~ 0.6 of price for industrials)
+            mb_safe = float(s.market_to_book) if s.market_to_book and float(s.market_to_book) > 0 else 1.5
+            bvps = max(0.5, last_price / mb_safe)
+            rps = last_price * float(rng.uniform(0.30, 1.20))
+            s.book_value_per_share = Decimal(str(round(bvps, 4)))
+            s.revenue_per_share = Decimal(str(round(rps, 4)))
+            s.debt_to_market_cap = Decimal(str(round(_sample_extra(rng, sector_code, "debt_to_market_cap"), 6)))
+            s.cash_to_assets = Decimal(str(round(_sample_extra(rng, sector_code, "cash_to_assets"), 6)))
+            s.receivables_to_assets = Decimal(str(round(_sample_extra(rng, sector_code, "receivables_to_assets"), 6)))
 
             # Disclosure dates — most issuers report quarterly. Pick a recent
             # quarter-end for balance sheet / income statement; a smaller set

@@ -224,6 +224,30 @@ class Stock(Base, TimestampMixin):
     last_income_statement_date: Mapped[date | None] = mapped_column(Date)
     latest_dividend_date: Mapped[date | None] = mapped_column(Date)
 
+    # Extended ratio set (Loay slide 79) — surfaced on the per-stock Analyze
+    # page rather than the main Screener table. All nullable.
+    # Liquidity
+    current_ratio: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    quick_ratio: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    cash_ratio: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    interest_coverage_ratio: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    # Efficiency
+    asset_turnover: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    inventory_turnover: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    receivables_turnover: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    payables_turnover: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
+    # Profitability
+    roa: Mapped[Decimal | None] = mapped_column(Numeric(10, 6))
+    net_profit_margin: Mapped[Decimal | None] = mapped_column(Numeric(10, 6))
+    gross_profit_margin: Mapped[Decimal | None] = mapped_column(Numeric(10, 6))
+    # Per-Share
+    book_value_per_share: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    revenue_per_share: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    # Shariah-Compliance
+    debt_to_market_cap: Mapped[Decimal | None] = mapped_column(Numeric(10, 6))
+    cash_to_assets: Mapped[Decimal | None] = mapped_column(Numeric(10, 6))
+    receivables_to_assets: Mapped[Decimal | None] = mapped_column(Numeric(10, 6))
+
     sector: Mapped[Sector | None] = relationship(back_populates="stocks")
     prices: Mapped[list["PriceDaily"]] = relationship(
         back_populates="stock", cascade="all, delete-orphan"
