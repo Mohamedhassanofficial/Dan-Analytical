@@ -20,6 +20,9 @@ if [[ "${SKIP_SEEDS:-0}" != "1" ]]; then
 
   echo "── seed_demo_prices (756d × ~233 stocks for Markowitz) ─────────────"
   python -m scripts.seed_demo_prices || echo "prices seed skipped"
+
+  echo "── seed_demo_user (idempotent admin demo@tadawul.local) ────────────"
+  python -m scripts.seed_demo_user || echo "demo user seed skipped"
 fi
 
 echo "── starting uvicorn on port ${PORT:-8000} ──────────────────────────"

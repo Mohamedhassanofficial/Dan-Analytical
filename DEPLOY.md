@@ -72,22 +72,29 @@ curl https://tadawul-api.onrender.com/health
 > **Skipping seeds**: set `SKIP_SEEDS=1` on the api service after Loay has
 > made any admin edits, so subsequent deploys don't try to re-bootstrap.
 
-## Demo credentials
+## Demo credentials (no manual step needed)
 
-The seeds promote a demo user that Loay can sign in as straight away. Run
-this once after the first deploy completes (Dashboard → `tadawul-api` →
-`Shell` tab):
+`start.sh` runs `scripts/seed_demo_user.py` on every cold start. That
+script creates (or refreshes) a fully-set-up demo user — admin role,
+disclaimer accepted, active subscription — so Loay can sign in
+straight away.
 
-```bash
-python -c "from app.db.session import SessionLocal; from app.db.models import User; \
-db = SessionLocal(); u = db.query(User).filter_by(email='demo@tadawul.local').first(); \
-u.role='admin' if u else None; \
-u.is_subscription_active=True if u else None; \
-db.commit(); print('demo user promoted:', u and u.email)"
+```
+Email:     demo@tadawul.local
+Password:  demo-video-2026
 ```
 
-(If the demo user does not exist yet, register at
-`https://tadawul-web.onrender.com/register` first, then run the snippet.)
+Override either via env vars on the api service if you want a different
+identity (`DEMO_USER_EMAIL`, `DEMO_USER_PASSWORD`). The seed is
+idempotent — re-running keeps the password/admin flag in sync without
+duplicating the user.
+
+When you send Loay the link, paste him these two:
+
+```
+https://tadawul-web.onrender.com/login
+demo@tadawul.local  /  demo-video-2026
+```
 
 ## Going beyond the free tier
 
