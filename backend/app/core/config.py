@@ -10,8 +10,10 @@ Usage:
 """
 from __future__ import annotations
 
+from typing import Annotated
+
 from pydantic import Field, PostgresDsn, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -41,7 +43,11 @@ class Settings(BaseSettings):
     db_pool_pre_ping: bool = True
 
     # --- CORS (frontend dev servers) ---
-    cors_origins: list[str] = [
+    # NoDecode tells pydantic-settings NOT to JSON-decode the env var; the
+    # _split_origins validator below parses the comma-separated string. Without
+    # this, Render's `CORS_ORIGINS=https://...` raw URL trips json.loads and the
+    # whole Settings() construction fails at import time.
+    cors_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
