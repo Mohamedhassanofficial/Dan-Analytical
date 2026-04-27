@@ -2,14 +2,13 @@ import { useTranslation } from "react-i18next";
 import { LogOut, UserCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocale } from "@/contexts/LocaleContext";
-import BrandLogo from "./BrandLogo";
 import LanguageSwitch from "./LanguageSwitch";
 
 /**
- * TopBar — Loay slide 2 marked the duplicate brand mark in the middle of
- * the header for removal ("حذف Logo"); the canonical logo lives in the
- * sidebar now. On mobile (where the sidebar is hidden) we still render
- * BrandLogo so the user always sees the brand on every screen.
+ * TopBar — Loay slide 2 marked the duplicate brand mark in the middle
+ * of the header for removal ("حذف Logo"). The canonical DAN logo lives
+ * in the sidebar now; the top bar carries language switch + signed-in
+ * user info + logout only.
  */
 export default function TopBar() {
   const { t } = useTranslation();
@@ -23,13 +22,8 @@ export default function TopBar() {
 
   return (
     <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-border bg-white/95 px-4 backdrop-blur sm:px-6">
-      {/* Mobile-only brand mark. Desktop already shows it inside the
-          sidebar; rendering it here too created the duplicate Loay flagged. */}
-      <div className="lg:hidden">
-        <BrandLogo size="lg" />
-      </div>
-      {/* Spacer that holds the start edge when sidebar is visible. */}
-      <div className="hidden lg:block" />
+      {/* start-edge spacer so justify-between still pushes controls to the end */}
+      <div />
 
       <div className="flex items-center gap-3">
         <LanguageSwitch />
