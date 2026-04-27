@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BarChart3, Check, CheckCircle2, Filter, Plus, Search, Shield, X } from "lucide-react";
-import { StocksAPI, type StockRow } from "@/api/stocks";
+import { StocksAPI, type SectorSummary, type StockRow } from "@/api/stocks";
 import { PortfolioAPI, type SavedPortfolio } from "@/api/portfolio";
 import { ApiError } from "@/api/client";
 import DataSourcesFooter from "@/components/DataSourcesFooter";
@@ -136,6 +136,7 @@ export default function ScreenerPage() {
   const portfolioIdNum = portfolioId ? Number(portfolioId) : null;
 
   const [rows, setRows] = useState<StockRow[] | null>(null);
+  const [sectorsSummary, setSectorsSummary] = useState<SectorSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [textFilter, setTextFilter] = useState("");
@@ -165,6 +166,9 @@ export default function ScreenerPage() {
         setError(e instanceof ApiError ? e.detail : t("errors.network"));
         setRows([]);
       });
+    StocksAPI.sectorsSummary()
+      .then(setSectorsSummary)
+      .catch(() => setSectorsSummary([]));
   }, [t]);
 
   useEffect(() => {
@@ -187,12 +191,29 @@ export default function ScreenerPage() {
     return new Set(portfolio.holdings.map((h) => h.ticker));
   }, [portfolio]);
 
-  const sectors = useMemo(() => {
+  // Per Loay slide #3: dropdown shows the human sector name + count, not
+  // the raw Tadawul code. Build the option list from sectorsSummary so the
+  // count comes straight from the catalogue, then fall back to the codes
+  // observed in `rows` if the summary endpoint hasn't responded yet.
+  const sectors = useMemo<{ code: string; label: string }[]>(() => {
+    if (sectorsSummary.length > 0) {
+      return sectorsSummary
+        .map((s) => ({
+          code: s.sector_code,
+          label:
+            locale === "ar"
+              ? `${s.sector_name_ar} — ${label("sector_avg.count_suffix", { n: s.stock_count })}`
+              : `${s.sector_name_en} — ${s.stock_count} stocks`,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+    }
     if (!rows) return [];
     const set = new Set<string>();
     for (const r of rows) if (r.sector_code) set.add(r.sector_code);
-    return [...set].sort((a, b) => a.localeCompare(b));
-  }, [rows]);
+    return [...set]
+      .sort((a, b) => a.localeCompare(b))
+      .map((code) => ({ code, label: code }));
+  }, [sectorsSummary, rows, locale, label]);
 
   const filtered = useMemo(() => {
     if (!rows) return [];
@@ -360,7 +381,7 @@ export default function ScreenerPage() {
         >
           <option value="">{label("screener.filter_any")}</option>
           {sectors.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s.code} value={s.code}>{s.label}</option>
           ))}
         </select>
 
