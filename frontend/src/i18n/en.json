@@ -45,6 +45,8 @@
     "col_capm_return": "Expected Return (CAPM)",
     "col_annual_vol": "Annual Volatility",
     "col_actions": "Actions",
+    "group_risk": "Risk Measurement Ratios",
+    "group_financial": "Financial Ratios",
     "filter_symbol": "Filter symbol",
     "filter_name": "Filter name",
     "filter_any": "Any",

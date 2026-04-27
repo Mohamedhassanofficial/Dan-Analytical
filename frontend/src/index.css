@@ -118,6 +118,19 @@ button {
     @apply px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white
            bg-brand-800 border-b border-brand-900 whitespace-nowrap;
   }
+  /* Group-header row above the column titles (Loay slide 4):
+     navy band labelled "Risk Measurement Ratios" / "Financial Ratios". */
+  .screener-group-row {
+    @apply sticky z-30 bg-brand-900;
+    top: 0;
+  }
+  .screener-group-header {
+    @apply px-3 py-2 text-center text-sm font-bold tracking-wide text-white
+           bg-brand-900 border-b border-brand-700;
+  }
+  .screener-group-blank {
+    @apply bg-brand-900 border-b border-brand-700;
+  }
   .screener-filter-cell {
     @apply px-2 py-1 bg-brand-50 border-b border-brand-200;
   }

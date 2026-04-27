@@ -44,6 +44,9 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
     ("screener.col_sector",         "القطاع",                      "Sector",                  "screener", None),
     ("screener.col_industry",       "النشاط",                      "Industry",                "screener", None),
     ("screener.col_actions",        "إجراءات",                     "Actions",                 "screener", None),
+    # Group-header bands above the column titles (Loay slide 4)
+    ("screener.group_risk",         "تحليل مؤشرات المخاطر",         "Risk Measurement Ratios", "screener", None),
+    ("screener.group_financial",    "تحليل النسب المالية",           "Financial Ratios",        "screener", None),
     # Column headers — Risk group (6 indicators + ranking)
     ("screener.col_beta",           "بيتا",                        "β",                       "screener", None),
     ("screener.col_capm_return",    "العائد المتوقع (CAPM)",      "Expected Return (CAPM)",  "screener", None),

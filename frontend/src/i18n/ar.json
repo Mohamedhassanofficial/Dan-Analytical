@@ -45,6 +45,8 @@
     "col_capm_return": "العائد المتوقع (CAPM)",
     "col_annual_vol": "التذبذب السنوي",
     "col_actions": "إجراءات",
+    "group_risk": "تحليل مؤشرات المخاطر",
+    "group_financial": "تحليل النسب المالية",
     "filter_symbol": "فلترة بالرمز",
     "filter_name": "فلترة بالاسم",
     "filter_any": "الكل",

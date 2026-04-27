@@ -29,38 +29,32 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Welcome strip */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-brand-900">
-          {label("home.welcome_back")}
-        </h1>
-      </div>
-
-      {/* Admin info banner */}
+      {/* Admin info banner — Loay slide 1 asked for the "welcome back" line
+          to go and the contact strip to read in bold prominent white. */}
       {user && (
-        <div className="card flex flex-wrap items-center justify-between gap-3 border-brand-300 bg-navy px-4 py-3 text-white">
-          <span className="text-sm font-semibold">
+        <div className="card flex flex-wrap items-center justify-between gap-3 border-brand-300 bg-navy px-5 py-4 text-white">
+          <span className="text-base font-bold">
             {label("home.admin_info", { name: userName })}
           </span>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-white/85">
-            <span className="inline-flex items-center gap-1.5">
-              <Mail size={14} />
+          <div className="flex flex-wrap items-center gap-5 text-sm font-semibold text-white">
+            <span className="inline-flex items-center gap-2">
+              <Mail size={16} />
               {user.email}
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Phone size={14} />
+            <span className="inline-flex items-center gap-2">
+              <Phone size={16} />
               {user.mobile}
             </span>
           </div>
         </div>
       )}
 
-      {/* (i) info strip */}
-      <div className="card flex items-start gap-3 border-brand-200 bg-brand-50 p-3 text-sm text-brand-900">
+      {/* (i) info strip — bumped to bold near-black per slide 1 markup. */}
+      <div className="card flex items-start gap-3 border-brand-200 bg-brand-50 p-4 text-base font-semibold leading-relaxed text-brand-900">
         <div className="grid h-9 w-9 flex-none place-items-center rounded-full bg-brand-100 text-brand-700">
           <span className="text-base font-bold">i</span>
         </div>
-        <p className="leading-relaxed">{label("home.info_strip")}</p>
+        <p>{label("home.info_strip")}</p>
       </div>
 
       {/* The three cards */}

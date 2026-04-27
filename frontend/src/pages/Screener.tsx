@@ -427,6 +427,25 @@ export default function ScreenerPage() {
         <div className="relative max-h-[75vh] overflow-auto">
           <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 4)}px` }}>
             <thead>
+              {/* Group-header row — Loay slide 4: every numeric column lives
+                  under either "Risk Measurement Ratios" or "Financial
+                  Ratios". Identifier + sector + actions cells stay blank. */}
+              <tr className="screener-group-row">
+                <th colSpan={4} className="screener-group-blank" />
+                <th
+                  colSpan={RISK_COLS.length + 1 /* + risk_ranking */}
+                  className="screener-group-header"
+                >
+                  {label("screener.group_risk")}
+                </th>
+                <th
+                  colSpan={FINANCIAL_COLS.length + DISCLOSURE_DATE_COLS.length}
+                  className="screener-group-header"
+                >
+                  {label("screener.group_financial")}
+                </th>
+                <th className="screener-group-blank" />
+              </tr>
               <tr>
                 <ThSticky colIndex={0}>{label("screener.col_symbol")}</ThSticky>
                 <ThSticky colIndex={1}>{label("screener.col_name")}</ThSticky>
