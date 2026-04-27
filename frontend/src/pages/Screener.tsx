@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, BarChart3, Check, CheckCircle2, Filter, Plus, Search, Shield, X } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Filter, LineChart, Plus, Search, Shield, X } from "lucide-react";
 import { StocksAPI, type SectorSummary, type StockRow } from "@/api/stocks";
 import { PortfolioAPI, type SavedPortfolio } from "@/api/portfolio";
 import { ApiError } from "@/api/client";
@@ -570,7 +570,7 @@ export default function ScreenerPage() {
                           title={label("screener.analyze")}
                           onClick={() => navigate(`/stocks/${r.ticker_suffix}/analyze`)}
                         >
-                          <BarChart3 size={14} />
+                          <LineChart size={14} />
                           <span className="hidden lg:inline">{label("screener.analyze")}</span>
                         </button>
                       </div>

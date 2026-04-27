@@ -92,19 +92,25 @@ LABELS: list[tuple[str, str, str, str, str | None]] = [
                                     "{{n}} companies in draft portfolio",                     "screener",
                                     "Keep the {{n}} placeholder."),
 
-    # ── Navigation (Loay slide 2 — 7 items in the sidebar) ──────────────
-    ("nav.home",      "الرئيسية",         "Home",           "nav", None),
-    ("nav.markets",   "الأسواق",          "Markets",        "nav", None),
-    ("nav.stocks",    "الأسهم",           "Stocks",         "nav", None),
-    ("nav.portfolios","المحافظ",          "Portfolios",     "nav", None),
-    ("nav.education", "التعليم",          "Education",      "nav", None),
-    ("nav.about",     "عن المالك",        "About",          "nav", None),
-    ("nav.admin",     "إدارة النظام",     "System Admin",   "nav", None),
+    # ── Navigation (Loay slide 2 — 7 sidebar items + admin) ─────────────
+    ("nav.home",              "الرئيسية",                              "Home",                                       "nav", None),
+    ("nav.tadawul_link",      "رابط سوق تداول",                        "Tadawul Market Link",                        "nav", None),
+    ("nav.portfolios_view",   "عرض المحافظ الاستثمارية",               "View Investment Portfolios",                 "nav", None),
+    ("nav.stock_indicators",  "المؤشرات الإرشادية لاختيار السهم المناسب", "Indicators for Selecting the Right Stock", "nav", None),
+    ("nav.financial_ratios",  "تحليل النسب المالية الرئيسية",          "Main Financial Ratios Analysis",             "nav", None),
+    ("nav.about_owner",       "لمحة مختصرة عن المالك",                  "Brief about the Owner",                      "nav", None),
+    ("nav.info_dashboard",    "لوحة تحكم المعلومات",                   "Information Dashboard",                      "nav", None),
+    ("nav.admin",             "إدارة النظام",                          "System Admin",                               "nav", None),
     # Legacy keys still referenced by older pages — kept until those pages refactor.
-    ("nav.screener",  "فلترة الأسهم",    "Stock Screener", "nav", None),
-    ("nav.dashboard", "اللوحة الرئيسية", "Dashboard",      "nav", None),
-    ("nav.optimize",  "تحسين المحفظة",   "Optimize",       "nav", None),
-    ("nav.history",   "سجل العمليات",    "Run History",    "nav", None),
+    ("nav.markets",           "الأسواق",                                "Markets",                                    "nav", None),
+    ("nav.stocks",            "الأسهم",                                 "Stocks",                                     "nav", None),
+    ("nav.portfolios",        "المحافظ",                                "Portfolios",                                 "nav", None),
+    ("nav.education",         "التعليم",                                "Education",                                  "nav", None),
+    ("nav.about",             "عن المالك",                              "About",                                      "nav", None),
+    ("nav.screener",          "فلترة الأسهم",                          "Stock Screener",                             "nav", None),
+    ("nav.dashboard",         "اللوحة الرئيسية",                       "Dashboard",                                  "nav", None),
+    ("nav.optimize",          "تحسين المحفظة",                         "Optimize",                                   "nav", None),
+    ("nav.history",           "سجل العمليات",                          "Run History",                                "nav", None),
 
     # ── Home / 3-card landing (Loay slide 2) ────────────────────────────
     ("home.welcome_back",   "مرحباً بعودتك إلى منصة التحكم",

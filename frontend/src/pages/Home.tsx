@@ -110,9 +110,10 @@ function ActionCard({
       <div className="absolute top-3 start-3 grid h-8 w-8 place-items-center rounded-full bg-brand-500 text-sm font-bold text-white shadow">
         {number}
       </div>
-      {/* Per-card explainer (i) — top-end. Bigger than column-header icons. */}
-      <div className="absolute top-3 end-3">
-        <HeaderInfo labelKey={explainerKey} iconSize={20} />
+      {/* Per-card explainer (i) — top-end. Loay slide 1 asked for a more
+          prominent description badge: square blue chip with a white "i". */}
+      <div className="absolute top-3 end-3 grid h-7 w-7 place-items-center rounded-md bg-brand-700 text-white shadow-sm hover:bg-brand-800">
+        <HeaderInfo labelKey={explainerKey} iconSize={16} inverse />
       </div>
 
       {/* Centered icon */}

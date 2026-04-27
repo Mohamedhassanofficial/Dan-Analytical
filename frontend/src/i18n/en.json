@@ -23,6 +23,13 @@
     "remove": "Remove"
   },
   "nav": {
+    "home": "Home",
+    "tadawul_link": "Tadawul Market Link",
+    "portfolios_view": "View Investment Portfolios",
+    "stock_indicators": "Indicators for Selecting the Right Stock",
+    "financial_ratios": "Main Financial Ratios Analysis",
+    "about_owner": "Brief about the Owner",
+    "info_dashboard": "Information Dashboard",
     "dashboard": "Dashboard",
     "screener": "Stock Screener",
     "optimize": "Optimize",

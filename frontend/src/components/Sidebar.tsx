@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
 import {
   Briefcase,
-  GraduationCap,
+  Calculator,
+  ExternalLink,
   Home,
-  LineChart,
+  LayoutDashboard,
   Settings,
   TrendingUp,
   User,
@@ -13,14 +14,19 @@ import { useLabel } from "@/contexts/LabelsContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 /**
- * Sidebar nav — 7 items per Loay slide #2.
+ * Sidebar nav — 7 items in the order Loay specified on slides 2 and 6:
+ *   الرئيسية / رابط سوق تداول / عرض المحافظ الاستثمارية /
+ *   المؤشرات الإرشادية لاختيار السهم المناسب /
+ *   تحليل النسب المالية الرئيسية /
+ *   لمحة مختصرة عن المالك / لوحة تحكم المعلومات
  *
- * Order (top → bottom):
- *   الرئيسية / الأسواق / الأسهم / المحافظ / التعليم / عن المالك / إدارة النظام
+ * Admin gear stays as a final item, hidden for non-admin users.
  *
  * `/optimize` and `/history` are not in the sidebar in this iteration; they
  * stay reachable by URL or via PortfolioDetails.
  */
+const TADAWUL_URL = "https://www.saudiexchange.sa";
+
 export default function Sidebar() {
   const label = useLabel();
   const { user } = useAuth();
@@ -39,25 +45,35 @@ export default function Sidebar() {
           <Home size={18} />
           {label("nav.home")}
         </NavLink>
-        <NavLink to="/markets" className={linkClass}>
-          <LineChart size={18} />
-          {label("nav.markets")}
+        {/* External link to the Tadawul exchange — opens in a new tab. */}
+        <a
+          href={TADAWUL_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-link"
+        >
+          <ExternalLink size={18} />
+          {label("nav.tadawul_link")}
+        </a>
+        <NavLink to="/portfolios" className={linkClass}>
+          <Briefcase size={18} />
+          {label("nav.portfolios_view")}
         </NavLink>
         <NavLink to="/screener" className={linkClass}>
           <TrendingUp size={18} />
-          {label("nav.stocks")}
+          {label("nav.stock_indicators")}
         </NavLink>
-        <NavLink to="/portfolios" className={linkClass}>
-          <Briefcase size={18} />
-          {label("nav.portfolios")}
-        </NavLink>
-        <NavLink to="/education" className={linkClass}>
-          <GraduationCap size={18} />
-          {label("nav.education")}
+        <NavLink to="/screener" className={linkClass}>
+          <Calculator size={18} />
+          {label("nav.financial_ratios")}
         </NavLink>
         <NavLink to="/about" className={linkClass}>
           <User size={18} />
-          {label("nav.about")}
+          {label("nav.about_owner")}
+        </NavLink>
+        <NavLink to="/dashboard" className={linkClass}>
+          <LayoutDashboard size={18} />
+          {label("nav.info_dashboard")}
         </NavLink>
         {user?.is_admin && (
           <NavLink to="/admin/config" className={linkClass}>

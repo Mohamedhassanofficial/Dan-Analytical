@@ -18,10 +18,13 @@ import { useLocale } from "@/contexts/LocaleContext";
 export default function HeaderInfo({
   labelKey,
   iconSize = 12,
+  inverse = false,
 }: {
   labelKey: string;
   /** Icon px size — small for table headers (12), larger for card corners (18). */
   iconSize?: number;
+  /** When the icon sits inside a colored badge, render it white. */
+  inverse?: boolean;
 }) {
   const { labels } = useLabelsContext();
   const { locale } = useLocale();
@@ -63,7 +66,11 @@ export default function HeaderInfo({
     <span ref={wrapRef} className="relative inline-flex">
       <button
         type="button"
-        className="inline-flex items-center text-muted hover:text-brand-700"
+        className={
+          inverse
+            ? "inline-flex items-center text-white hover:text-white/85"
+            : "inline-flex items-center text-muted hover:text-brand-700"
+        }
         onClick={(e) => {
           e.stopPropagation();
           setOpen((v) => !v);
