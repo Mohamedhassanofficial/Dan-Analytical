@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Check, CheckCircle2, Filter, LineChart, Plus, Search, X } from "lucide-react";
-import { StocksAPI, type SectorSummary, type StockRow } from "@/api/stocks";
+import { StocksAPI, type StockRow } from "@/api/stocks";
 import { PortfolioAPI, type SavedPortfolio } from "@/api/portfolio";
 import { ApiError } from "@/api/client";
 import DataSourcesFooter from "@/components/DataSourcesFooter";
@@ -136,7 +136,6 @@ export default function ScreenerPage() {
   const portfolioIdNum = portfolioId ? Number(portfolioId) : null;
 
   const [rows, setRows] = useState<StockRow[] | null>(null);
-  const [sectorsSummary, setSectorsSummary] = useState<SectorSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [textFilter, setTextFilter] = useState("");
@@ -166,9 +165,6 @@ export default function ScreenerPage() {
         setError(e instanceof ApiError ? e.detail : t("errors.network"));
         setRows([]);
       });
-    StocksAPI.sectorsSummary()
-      .then(setSectorsSummary)
-      .catch(() => setSectorsSummary([]));
   }, [t]);
 
   useEffect(() => {
@@ -192,29 +188,6 @@ export default function ScreenerPage() {
   }, [portfolio]);
 
   // Per Loay slide #3: dropdown shows the human sector name + count, not
-  // the raw Tadawul code. Build the option list from sectorsSummary so the
-  // count comes straight from the catalogue, then fall back to the codes
-  // observed in `rows` if the summary endpoint hasn't responded yet.
-  const sectors = useMemo<{ code: string; label: string }[]>(() => {
-    if (sectorsSummary.length > 0) {
-      return sectorsSummary
-        .map((s) => ({
-          code: s.sector_code,
-          label:
-            locale === "ar"
-              ? `${s.sector_name_ar} — ${label("sector_avg.count_suffix", { n: s.stock_count })}`
-              : `${s.sector_name_en} — ${s.stock_count} stocks`,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label));
-    }
-    if (!rows) return [];
-    const set = new Set<string>();
-    for (const r of rows) if (r.sector_code) set.add(r.sector_code);
-    return [...set]
-      .sort((a, b) => a.localeCompare(b))
-      .map((code) => ({ code, label: code }));
-  }, [sectorsSummary, rows, locale, label]);
-
   const filtered = useMemo(() => {
     if (!rows) return [];
     const q = textFilter.trim().toLowerCase();
@@ -323,20 +296,17 @@ export default function ScreenerPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Title + summary */}
+      {/* Title + summary — Loay slide 2: page title + a single description
+          line carrying the live company count and the newest price date. */}
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold text-brand-900">{label("screener.title")}</h1>
-        <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
-          <span>
-            {rows === null
-              ? t("common.loading")
-              : label("screener.summary", { total: rows.length, shown: filtered.length })}
-          </span>
-          {lastUpdate && (
-            <span className="badge-info">
-              {label("screener.last_update")}: {lastUpdate}
-            </span>
-          )}
+        <div className="rounded-md bg-brand-900 px-4 py-2 text-sm font-semibold text-white">
+          {rows === null
+            ? t("common.loading")
+            : label("screener.summary", {
+                total: rows.length,
+                updated: lastUpdate ?? "—",
+              })}
         </div>
       </div>
 
@@ -362,7 +332,10 @@ export default function ScreenerPage() {
         </div>
       )}
 
-      {/* Toolbar */}
+      {/* Toolbar — Loay slide 2: text search + risk/financial filter
+          buttons + clear. The standalone "الكل" sector dropdown was
+          dropped per "حذف الحقل"; sector picking now happens inside the
+          SectorAveragesPanel below, which already drives the same filter. */}
       <div className="card flex flex-wrap items-center gap-3 p-3">
         <div className="relative">
           <Search className="absolute top-1/2 start-3 -translate-y-1/2 text-muted" size={16} />
@@ -373,17 +346,6 @@ export default function ScreenerPage() {
             onChange={(e: ChangeEvent<HTMLInputElement>) => setTextFilter(e.target.value)}
           />
         </div>
-
-        <select
-          className="input w-44"
-          value={sectorFilter}
-          onChange={(e) => setSectorFilter(e.target.value)}
-        >
-          <option value="">{label("screener.filter_any")}</option>
-          {sectors.map((s) => (
-            <option key={s.code} value={s.code}>{s.label}</option>
-          ))}
-        </select>
 
         <button className="btn-secondary" onClick={() => setRiskModalOpen(true)}>
           <Filter size={16} />

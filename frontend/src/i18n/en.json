@@ -40,8 +40,8 @@
     "admin_upload": "Upload Data"
   },
   "screener": {
-    "title": "Stock Screener",
-    "summary": "{{shown}} of {{total}} companies",
+    "title": "Stock Performance Analysis & Portfolio Selection",
+    "summary": "The Saudi Exchange (Tadawul) currently lists {{total}} companies — Last price update: {{updated}}",
     "search_placeholder": "Search symbol or name…",
     "clear_filters": "Clear filters",
     "col_symbol": "Symbol",
