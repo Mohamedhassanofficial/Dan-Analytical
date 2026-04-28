@@ -96,7 +96,7 @@ button {
      `numToneClass` (positive = ink, zero/negative = danger). Body default
      covers text cells via `html { color: ink }`.                       */
   .screener-cell {
-    @apply px-3 py-2 text-sm whitespace-nowrap;
+    @apply px-3 py-2 text-sm whitespace-nowrap text-center;
   }
 
   /* Negative numeric cell — light pink background per PPTX slide 91. The

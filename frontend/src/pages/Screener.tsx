@@ -458,7 +458,7 @@ export default function ScreenerPage() {
                     clipping; longer AR names wrap onto a second line via
                     the body cell's whitespace-normal. */}
                 <th
-                  className="screener-th sticky z-20 text-start"
+                  className="screener-th sticky z-20 text-center"
                   style={{ top: COLUMN_TITLE_TOP, width: "14rem", minWidth: "14rem" }}
                 >
                   {label("screener.col_industry")}
@@ -525,7 +525,7 @@ export default function ScreenerPage() {
                       return (
                         <td
                           key={c.key as string}
-                          className={`screener-cell text-right tabular-nums ${numToneClass(v)}`}
+                          className={`screener-cell tabular-nums ${numToneClass(v)}`}
                         >
                           {formatCell(v, c)}
                         </td>
@@ -547,7 +547,7 @@ export default function ScreenerPage() {
                       return (
                         <td
                           key={c.key as string}
-                          className={`screener-cell text-right tabular-nums ${numToneClass(v)}`}
+                          className={`screener-cell tabular-nums ${numToneClass(v)}`}
                         >
                           {formatCell(v, c)}
                         </td>
@@ -560,7 +560,7 @@ export default function ScreenerPage() {
                       return (
                         <td
                           key={c.key}
-                          className={`screener-cell text-right tabular-nums ${v ? "text-ink" : "text-muted"}`}
+                          className={`screener-cell tabular-nums ${v ? "text-ink" : "text-muted"}`}
                         >
                           {v ?? "N/A"}
                         </td>
@@ -875,7 +875,7 @@ function Th({
 }) {
   return (
     <th
-      className="screener-th sticky z-20 text-start"
+      className="screener-th sticky z-20 text-center"
       style={{ top: COLUMN_TITLE_TOP, ...(minWidth ? { minWidth } : {}) }}
     >
       {children}
