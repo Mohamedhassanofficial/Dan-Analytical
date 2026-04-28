@@ -18,18 +18,21 @@ if [[ "${SKIP_SEEDS:-0}" != "1" ]]; then
   echo "── seed_demo_user (idempotent admin demo@tadawul.local) ────────────"
   python -m scripts.seed_demo_user || echo "demo user seed skipped"
 
-  # Heavy seeds run AFTER uvicorn binds to $PORT — Render measures deploy
-  # success by port-binding, so the api shows green within ~60s and the
-  # analytics/price data lands a few minutes later.
+  # Analytics seed moved to FOREGROUND (was bg). With 269 stocks this finishes
+  # in ~30s and guarantees the new IPOs (BURGERIZZR, JAHEZ, FLYNAS, etc.) have
+  # populated analytics before uvicorn answers the first request — empty
+  # cells for new stocks are no longer possible.
+  echo "── seed_all_stocks_analytics (full universe synthetic indicators) ──"
+  python -m scripts.seed_all_stocks_analytics || echo "analytics seed skipped"
+
+  # The price seed stays in background — it inserts 756 × 269 ≈ 200k rows
+  # which takes 3-5 minutes and would otherwise trip Render's deploy timeout.
   (
     sleep 5
-    echo "── (bg) seed_all_stocks_analytics (full universe synthetic indicators) ──"
-    python -m scripts.seed_all_stocks_analytics || echo "analytics seed skipped"
-
-    echo "── (bg) seed_demo_prices (756d × ~233 stocks for Markowitz) ─────"
+    echo "── (bg) seed_demo_prices (756d × ~269 stocks for Markowitz) ─────"
     python -m scripts.seed_demo_prices || echo "prices seed skipped"
 
-    echo "── (bg) all background seeds complete ──"
+    echo "── (bg) price seed complete ──"
   ) &
 fi
 

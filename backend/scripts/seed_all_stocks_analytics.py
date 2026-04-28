@@ -207,6 +207,13 @@ PROFILES: dict[str, dict[str, tuple[float, float]]] = {
         "roe": (0.08, 0.18), "mb": (2.0, 5.0), "fcf_yield": (0.020, 0.055),
         "leverage": (0.30, 1.00), "last_price": (20.0, 100.0),
     },
+    "THPI": {  # Household & Personal Products (ALMAJED OUD — luxury / niche)
+        "beta": (0.80, 1.10), "ann_vol": (0.18, 0.28),
+        "capm_mu": (0.06, 0.10), "pe": (18.0, 32.0), "eps": (0.6, 2.5),
+        "div_yield": (0.010, 0.035), "div_rate": (0.2, 1.5),
+        "roe": (0.08, 0.18), "mb": (2.0, 4.5), "fcf_yield": (0.020, 0.050),
+        "leverage": (0.25, 0.85), "last_price": (30.0, 90.0),
+    },
 }
 
 
