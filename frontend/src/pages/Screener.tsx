@@ -1,7 +1,29 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, BarChart3, Check, CheckCircle2, Filter, Plus, Search, X } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Filter, Plus, Search, X } from "lucide-react";
+
+/**
+ * Custom bar-chart glyph for the Analyze button. Two-tone (green up bars +
+ * red down bars) per Loay slide 4 — picked over a monochrome lucide icon
+ * because the mockup's icon explicitly shows colored bars.
+ */
+function AnalyzeBars({ size = 14 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect x="1"  y="7" width="2.5" height="6" rx="0.4" fill="#ef4444" />
+      <rect x="4.25" y="4" width="2.5" height="9" rx="0.4" fill="#22c55e" />
+      <rect x="7.5"  y="6" width="2.5" height="7" rx="0.4" fill="#ef4444" />
+      <rect x="10.75" y="2" width="2.5" height="11" rx="0.4" fill="#22c55e" />
+    </svg>
+  );
+}
 import { StocksAPI, type StockRow } from "@/api/stocks";
 import { PortfolioAPI, type SavedPortfolio } from "@/api/portfolio";
 import { ApiError } from "@/api/client";
@@ -557,7 +579,7 @@ export default function ScreenerPage() {
                           title={label("screener.analyze")}
                           onClick={() => navigate(`/stocks/${r.ticker_suffix}/analyze`)}
                         >
-                          <BarChart3 size={14} className="text-pink-500" />
+                          <AnalyzeBars />
                           <span className="hidden lg:inline">{label("screener.analyze")}</span>
                         </button>
                       </div>
