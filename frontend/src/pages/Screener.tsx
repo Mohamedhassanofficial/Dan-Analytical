@@ -95,11 +95,19 @@ const FINANCIAL_COLS: NumericCol[] = [
   { key: "annual_dividend_rate", labelKey: "screener.col_div_rate",   fmt: "money" },
 ];
 
+// Forward fmt so the filter modal knows which inputs are percent-encoded
+// in the DB and converts user-friendly values (4 → 0.04) at apply time.
 const RISK_FILTER_COLS: FilterableColumn[] = RISK_COLS
   .filter((c) => c.key !== "risk_ranking") // risk_ranking is categorical
-  .map((c) => ({ key: c.key as string, labelKey: c.labelKey }));
+  .map((c) => ({
+    key: c.key as string,
+    labelKey: c.labelKey,
+    fmt: c.fmt === "pct" ? "pct" : "num",
+  }));
 const FINANCIAL_FILTER_COLS: FilterableColumn[] = FINANCIAL_COLS.map((c) => ({
-  key: c.key as string, labelKey: c.labelKey,
+  key: c.key as string,
+  labelKey: c.labelKey,
+  fmt: c.fmt === "pct" ? "pct" : "num",
 }));
 
 // ── Numeric cell tone rule (accountant-style) ───────────────────────────────

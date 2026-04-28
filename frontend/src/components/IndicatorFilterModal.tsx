@@ -25,6 +25,11 @@ export interface OpFilter {
 export interface FilterableColumn {
   key: string;       // matches StockRow field name (e.g. "pe_ratio")
   labelKey: string;  // ui_labels key (e.g. "screener.col_pe")
+  /** "pct" columns are stored as decimals in the DB (0.04 = 4%). The
+   *  modal accepts and displays the user-friendly percentage value
+   *  (4) and converts to/from the decimal at apply/seed time so the
+   *  passesFilter comparison sees matching units. */
+  fmt?: "num" | "pct";
 }
 
 interface Props {
@@ -49,12 +54,16 @@ export default function IndicatorFilterModal({
   const label = useLabel();
 
   // Seed draft state from the current filter list each time we open.
+  // pct columns: stored value is a decimal (0.04); display the friendly 4.
   const seed = useMemo<Record<string, DraftRow>>(() => {
     const out: Record<string, DraftRow> = {};
     for (const c of columns) {
       const existing = current.find((f) => f.key === c.key);
+      const displayValue = existing
+        ? (c.fmt === "pct" ? String(existing.value * 100) : String(existing.value))
+        : "";
       out[c.key] = existing
-        ? { enabled: true, op: existing.op, value: String(existing.value) }
+        ? { enabled: true, op: existing.op, value: displayValue }
         : { enabled: false, op: ">=", value: "" };
     }
     return out;
@@ -83,8 +92,11 @@ export default function IndicatorFilterModal({
     for (const c of columns) {
       const d = draft[c.key];
       if (!d.enabled) continue;
-      const v = parseFloat(d.value);
-      if (Number.isNaN(v)) continue;
+      const raw = parseFloat(d.value);
+      if (Number.isNaN(raw)) continue;
+      // pct columns: user types "4" meaning 4%, store as 0.04 to match
+      // the decimal-encoded ROE / yield / vol fields on the StockRow.
+      const v = c.fmt === "pct" ? raw / 100 : raw;
       out.push({ key: c.key, op: d.op, value: v });
     }
     onApply(out);
@@ -164,14 +176,22 @@ export default function IndicatorFilterModal({
                       </select>
                     </td>
                     <td className="py-2">
-                      <input
-                        type="number"
-                        step="any"
-                        className="input h-8 py-1 text-xs"
-                        value={d.value}
-                        disabled={!d.enabled}
-                        onChange={(e) => update(c.key, { value: e.target.value })}
-                      />
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="any"
+                          className={`input h-8 py-1 text-xs ${c.fmt === "pct" ? "pe-7" : ""}`}
+                          value={d.value}
+                          disabled={!d.enabled}
+                          placeholder={c.fmt === "pct" ? "4" : "0.5"}
+                          onChange={(e) => update(c.key, { value: e.target.value })}
+                        />
+                        {c.fmt === "pct" && (
+                          <span className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted">
+                            %
+                          </span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
