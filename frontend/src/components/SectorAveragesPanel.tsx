@@ -172,7 +172,7 @@ export default function SectorAveragesPanel() {
         {averages && group && (
           <div className="rounded-lg border border-brand-200 bg-brand-50 p-3">
             {group === "risk" && (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 <Card labelKey="screener.col_var_1d" value={averages.avg_var_95_daily} fmt="pct" />
                 <Card labelKey="screener.col_sharp" value={averages.avg_sharp_ratio} fmt="num" />
                 <Card labelKey="screener.col_beta" value={averages.avg_beta} fmt="num" />
@@ -191,7 +191,7 @@ export default function SectorAveragesPanel() {
             )}
 
             {group === "financial" && (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
                 <Card labelKey="screener.col_pe" value={averages.avg_pe_ratio} fmt="num" digits={2} />
                 <Card labelKey="screener.col_roe" value={averages.avg_roe} fmt="pct" />
                 <Card labelKey="screener.col_leverage" value={averages.avg_leverage_ratio} fmt="num" digits={2} />
@@ -228,12 +228,12 @@ function Card({
         ? fmtPct(value, digits ?? 2)
         : fmtNum(value, digits ?? 3);
   return (
-    <div className="rounded-lg border border-brand-200 bg-white p-5 text-center shadow-sm">
-      <div className="inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-brand-800">
+    <div className="rounded-lg border border-brand-200 bg-brand-50 p-3 text-center">
+      <div className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-brand-800">
         {label(labelKey)}
         <HeaderInfo labelKey={labelKey} />
       </div>
-      <div className={`mt-3 text-3xl font-bold tabular-nums ${tone(value)}`}>
+      <div className={`mt-1 text-lg font-semibold tabular-nums ${tone(value)}`}>
         {display}
       </div>
     </div>
@@ -251,14 +251,14 @@ function RankingCard({
 }) {
   const label = useLabel();
   return (
-    <div className="rounded-lg border border-brand-200 bg-white p-5 text-center shadow-sm">
-      <div className="inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-brand-800">
+    <div className="rounded-lg border border-brand-200 bg-brand-50 p-3 text-center">
+      <div className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-brand-800">
         {label(labelKey)}
         <HeaderInfo labelKey={labelKey} />
       </div>
-      <div className="mt-3 flex items-center justify-center">
+      <div className="mt-2">
         {ranking ? (
-          <span className={`${rankingClass(ranking)} text-base`}>{rankingLabel}</span>
+          <span className={rankingClass(ranking)}>{rankingLabel}</span>
         ) : (
           <span className="text-muted">—</span>
         )}
