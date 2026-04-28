@@ -167,7 +167,6 @@ export default function IndicatorFilterModal({
                       <select
                         className="input h-8 py-1 text-xs"
                         value={d.op}
-                        disabled={!d.enabled}
                         onChange={(e) => update(c.key, { op: e.target.value as OpFilterOperator })}
                       >
                         {OPERATORS.map((op) => (
@@ -182,9 +181,16 @@ export default function IndicatorFilterModal({
                           step="any"
                           className={`input h-8 py-1 text-xs ${c.fmt === "pct" ? "pe-7" : ""}`}
                           value={d.value}
-                          disabled={!d.enabled}
                           placeholder={c.fmt === "pct" ? "4" : "0.5"}
-                          onChange={(e) => update(c.key, { value: e.target.value })}
+                          onChange={(e) => {
+                            // Auto-tick the row when the user types a value;
+                            // auto-untick when they clear it. The checkbox
+                            // is now just a "disable without losing the value"
+                            // toggle. Loay flagged that requiring a manual
+                            // tick was non-obvious — the input felt frozen.
+                            const next = e.target.value;
+                            update(c.key, { value: next, enabled: next !== "" });
+                          }}
                         />
                         {c.fmt === "pct" && (
                           <span className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted">
