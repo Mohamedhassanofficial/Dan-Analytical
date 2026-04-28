@@ -80,6 +80,7 @@ SECTOR_NAMES: dict[str, tuple[str, str]] = {
     "TFBI": ("قطاع إنتاج الأغذية", "Food & Beverages"),
     "TFSI": ("قطاع تجزئة وتوزيع السلع الاستهلاكية", "Consumer Staples Distribution & Retail"),
     "THEI": ("قطاع معدات وخدمات الرعاية الصحية", "Health Care Equipment & Svc"),
+    "THPI": ("قطاع المنتجات المنزلية والشخصية", "Household & Personal Products"),
     "TISI": ("قطاع التأمين", "Insurance"),
     "TMDI": ("قطاع الإعلام والترفيه", "Media and Entertainment"),
     "TMTI": ("قطاع المواد الأساسية", "Materials"),
