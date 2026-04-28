@@ -425,7 +425,7 @@ export default function ScreenerPage() {
       {/* Table */}
       <div className="card p-0 overflow-hidden">
         <div className="relative max-h-[75vh] overflow-auto">
-          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 2) + 288 /* 18rem industry */}px` }}>
+          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 2) + 352 /* 22rem industry */}px` }}>
             <thead>
               {/* Group-header row — Loay slide 4: every numeric column lives
                   under either "Risk Measurement Ratios" or "Financial
@@ -452,7 +452,16 @@ export default function ScreenerPage() {
               <tr>
                 <ThSticky colIndex={0}>{label("screener.col_symbol")}</ThSticky>
                 <ThSticky colIndex={1}>{label("screener.col_name")}</ThSticky>
-                <Th minWidth="18rem">{label("screener.col_industry")}</Th>
+                {/* Industry column — Loay flagged this twice for being too
+                    narrow ("ظبطه كويس جدا في النشاط في مساحه"). Force width
+                    via both width and minWidth so the table-layout: auto
+                    can't squeeze it under the longest sector name. */}
+                <th
+                  className="screener-th sticky z-20 text-start"
+                  style={{ top: COLUMN_TITLE_TOP, width: "22rem", minWidth: "22rem" }}
+                >
+                  {label("screener.col_industry")}
+                </th>
                 {RISK_COLS.map((c) => (
                   <Th key={c.key as string}>
                     <span className="inline-flex items-center gap-1.5">
@@ -502,7 +511,12 @@ export default function ScreenerPage() {
                         <span className="text-xs text-muted">{r.ticker_suffix}</span>
                       </div>
                     </TdSticky>
-                    <td className="screener-cell text-ink whitespace-normal">{displayIndustry(r)}</td>
+                    <td
+                      className="screener-cell text-ink whitespace-normal"
+                      style={{ width: "22rem", minWidth: "22rem" }}
+                    >
+                      {displayIndustry(r)}
+                    </td>
 
                     {/* Risk indicators (except risk_ranking, which is separate) */}
                     {RISK_COLS.slice(0, -1).map((c) => {
