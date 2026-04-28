@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Calculator, Filter, RefreshCw, Shield } from "lucide-react";
+import { Calculator, Filter, RefreshCw } from "lucide-react";
 import {
   StocksAPI,
   type SectorAverages,
@@ -108,17 +108,6 @@ export default function SectorAveragesPanel() {
       ? `${s.sector_name_ar} — ${label("sector_avg.count_suffix", { n: s.stock_count })}`
       : `${s.sector_name_en} — ${s.stock_count} stocks`;
 
-  // Selected sector's name + count, formatted for the chip beside the
-  // CTA buttons (slide 4: "البنوك – عددها 21").
-  const sectorChip = useMemo(() => {
-    const sel = sectors.find((s) => s.sector_code === selectedSector);
-    if (!sel) return null;
-    return label("sector_avg.count_chip", {
-      name: locale === "ar" ? sel.sector_name_ar : sel.sector_name_en,
-      n: sel.stock_count,
-    });
-  }, [sectors, selectedSector, locale, label]);
-
   return (
     <div className="card flex flex-col overflow-hidden p-0">
       {/* Title bar — slide 4: brand-700 band with the screen heading. */}
@@ -142,16 +131,16 @@ export default function SectorAveragesPanel() {
             ))}
           </select>
 
-          {sectorChip && (
-            <span className="badge-info">{sectorChip}</span>
-          )}
+          {/* Loay slide 2 marked the duplicate "قطاع X — عددها N" chip
+              for removal ("حذف الحقل") — the dropdown above already shows
+              the same selection, so the badge was redundant. */}
 
           <button
             className={group === "risk" ? "btn-primary" : "btn-secondary"}
             onClick={() => pickGroup("risk")}
             disabled={!selectedSector}
           >
-            <Shield size={14} />
+            <Filter size={14} />
             {label("sector_avg.btn_risk")}
           </button>
 
