@@ -494,6 +494,23 @@ def seed() -> int:
             # on_conflict_do_nothing → admin edits are preserved across re-runs.
             db.execute(stmt)
 
+        # Spec-driven labels that MUST track the latest seed value even when
+        # they already exist in the DB — these are page titles / templates the
+        # admin shouldn't be editing manually anyway. Loay slide 2 rewrote
+        # screener.title and screener.summary; without this update block the
+        # earlier "{{shown}} من إجمالي" template stuck around in the DB and
+        # the new code shipped with the placeholder unresolved.
+        FORCE_UPDATE_KEYS = {"screener.title", "screener.summary"}
+        for key, label_ar, label_en, _context, _desc_en in LABELS:
+            if key in FORCE_UPDATE_KEYS:
+                db.execute(
+                    text(
+                        "UPDATE ui_labels SET label_ar = :ar, label_en = :en "
+                        "WHERE key = :k"
+                    ),
+                    {"k": key, "ar": label_ar, "en": label_en},
+                )
+
         # Backfill long descriptions for indicator columns. Only writes when
         # the field is currently NULL — admin overrides are preserved.
         for key, desc_ar, desc_en in INDICATOR_DESCRIPTIONS:

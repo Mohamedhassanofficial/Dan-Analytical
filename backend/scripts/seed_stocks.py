@@ -64,27 +64,43 @@ def _pick_column(df: pd.DataFrame, candidates: list[str]) -> str | None:
 # The CSV only carries the code; we hydrate names from this fixed map. Admins
 # can edit name_ar / name_en afterwards via the admin_config UI.
 SECTOR_NAMES: dict[str, tuple[str, str]] = {
+    # Tadawul GICS index codes (current as of 2026). The previous dict
+    # had several stale codes (TCSI/TINI/TPHI/TREI/TRDI/TCMI/TSWI) that
+    # don't appear in the live Index-Data feed, so the AR/EN names never
+    # rendered for the actual rows. Codes below match the index file
+    # Loay sent and Mohammed's slide 3 dropdown mock.
     "TASI": ("المؤشر العام للسوق", "Tadawul All Share Index"),
-    "TENI": ("قطاع الطاقة", "Energy"),
-    "TMTI": ("قطاع المواد الأساسية", "Materials"),
-    "TCSI": ("قطاع السلع الرأسمالية", "Capital Goods"),
-    "TRTI": ("قطاع النقل", "Transportation"),
-    "TCDI": ("قطاع السلع الاستهلاكية الكمالية", "Consumer Discretionary"),
-    "TCMI": ("قطاع الإعلام", "Media & Entertainment"),
-    "TRSI": ("قطاع البيع التجزئة", "Retailing"),
-    "TFBI": ("قطاع الأغذية", "Food & Beverages"),
-    "TCSI2": ("قطاع المستلزمات الصحية", "Consumer Services"),
-    "THCI": ("قطاع الرعاية الصحية", "Health Care Equipment & Svc"),
-    "TPHI": ("قطاع الأدوية", "Pharma, Biotech & Life Sci"),
     "TBNI": ("قطاع البنوك", "Banks"),
+    "TCDI": ("قطاع السلع الاستهلاكية الكمالية", "Consumer Discretionary"),
+    "TCGI": ("قطاع السلع الرأسمالية", "Capital Goods"),
+    "TCMI": ("قطاع الخدمات التجارية والمهنية", "Commercial & Professional Svc"),
+    "TCPI": ("قطاع توزيع وبيع السلع الكمالية بالتجزئة", "Consumer Discretionary Distribution & Retail"),
+    "TCSI": ("قطاع السلع الرأسمالية", "Capital Goods"),
+    "TDAI": ("قطاع السلع المعمرة والملابس", "Consumer Durables & Apparel"),
     "TDFI": ("قطاع الخدمات المالية المتنوعة", "Diversified Financials"),
+    "TENI": ("قطاع الطاقة", "Energy"),
+    "TFBI": ("قطاع إنتاج الأغذية", "Food & Beverages"),
+    "TFNI": ("قطاع الخدمات الاستهلاكية", "Consumer Services"),
+    "TFSI": ("قطاع الخدمات المالية", "Financial Services"),
+    "THCI": ("قطاع معدات وخدمات الرعاية الصحية", "Health Care Equipment & Svc"),
+    "THEI": ("قطاع معدات وخدمات الرعاية الصحية", "Health Care Equipment & Svc"),
     "TINI": ("قطاع التأمين", "Insurance"),
+    "TISI": ("قطاع التأمين", "Insurance"),
+    "TMDI": ("قطاع الإعلام والترفيه", "Media & Entertainment"),
+    "TMTI": ("قطاع المواد الأساسية", "Materials"),
+    "TPBI": ("قطاع الأدوية والتقنية الحيوية", "Pharma, Biotech & Life Sci"),
+    "TPHI": ("قطاع الأدوية والتقنية الحيوية", "Pharma, Biotech & Life Sci"),
+    "TRDI": ("قطاع إدارة وتطوير العقارات", "Real Estate Mgmt & Dev"),
+    "TREI": ("قطاع الريت", "REITs"),
+    "TRLI": ("قطاع الريت", "REITs"),
+    "TRMI": ("قطاع إدارة وتطوير العقارات", "Real Estate Mgmt & Dev"),
+    "TRSI": ("قطاع تجزئة السلع الكمالية والاستهلاكية", "Retailing"),
+    "TRTI": ("قطاع النقل", "Transportation"),
+    "TSCI": ("قطاع البرمجيات والخدمات", "Software & Services"),
+    "TSWI": ("قطاع الخدمات التجارية والمهنية", "Commercial & Professional Svc"),
+    "TSSI": ("قطاع تقنية المعلومات", "Technology Hardware & Equipment"),
     "TTSI": ("قطاع الاتصالات", "Telecommunication Services"),
     "TUTI": ("قطاع المرافق", "Utilities"),
-    "TREI": ("قطاع الريت", "REITs"),
-    "TRDI": ("قطاع إدارة وتطوير العقارات", "Real Estate Mgmt & Dev"),
-    "TSWI": ("قطاع الخدمات التجارية والمهنية", "Commercial & Professional Svc"),
-    "TFNI": ("قطاع الخدمات الاستهلاكية", "Consumer Services"),
 }
 
 
