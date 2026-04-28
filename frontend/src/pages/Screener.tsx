@@ -507,7 +507,7 @@ export default function ScreenerPage() {
                       {r.symbol}
                     </TdSticky>
                     <TdSticky colIndex={1}>
-                      <div className="flex flex-col">
+                      <div className="flex flex-col items-center">
                         <span className="font-medium text-brand-900">{displayName(r)}</span>
                         <span className="text-xs text-muted">{r.ticker_suffix}</span>
                       </div>
