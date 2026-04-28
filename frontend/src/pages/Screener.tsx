@@ -141,8 +141,19 @@ function rankingBadgeClass(rank: string | null | undefined): string {
 
 // ── OpFilter evaluator ─────────────────────────────────────────────────────
 function passesFilter(row: StockRow, f: OpFilter): boolean {
-  const v = row[f.key as keyof StockRow];
-  if (typeof v !== "number") return false; // null / string → excluded by strict op
+  // FastAPI serializes Numeric/Decimal columns as JSON strings to preserve
+  // precision, so the financial fields (pe_ratio, roe, eps, …) arrive as
+  // strings even though the TS type says `number`. Coerce defensively
+  // before the comparison; the original `typeof v !== "number"` guard was
+  // silently rejecting every row in the financial-filter path.
+  const raw = row[f.key as keyof StockRow];
+  const v =
+    typeof raw === "number"
+      ? raw
+      : typeof raw === "string" && raw !== ""
+        ? Number(raw)
+        : NaN;
+  if (Number.isNaN(v)) return false;
   switch (f.op) {
     case "=":  return Math.abs(v - f.value) < 1e-9;
     case "<":  return v < f.value;
