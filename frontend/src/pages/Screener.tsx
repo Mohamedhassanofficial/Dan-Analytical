@@ -425,7 +425,7 @@ export default function ScreenerPage() {
       {/* Table */}
       <div className="card p-0 overflow-hidden">
         <div className="relative max-h-[75vh] overflow-auto">
-          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 2) + 256 /* 16rem industry */}px` }}>
+          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 2) + 288 /* 18rem industry */}px` }}>
             <thead>
               {/* Group-header row — Loay slide 4: every numeric column lives
                   under either "Risk Measurement Ratios" or "Financial
@@ -459,7 +459,7 @@ export default function ScreenerPage() {
                     the body cell's whitespace-normal. */}
                 <th
                   className="screener-th sticky z-20 text-center"
-                  style={{ top: COLUMN_TITLE_TOP, width: "16rem", minWidth: "16rem" }}
+                  style={{ top: COLUMN_TITLE_TOP, width: "18rem", minWidth: "18rem" }}
                 >
                   {label("screener.col_industry")}
                 </th>
@@ -514,7 +514,7 @@ export default function ScreenerPage() {
                     </TdSticky>
                     <td
                       className="screener-cell text-ink whitespace-normal"
-                      style={{ width: "16rem", minWidth: "16rem" }}
+                      style={{ width: "18rem", minWidth: "18rem" }}
                     >
                       {displayIndustry(r)}
                     </td>
