@@ -297,16 +297,25 @@ export default function ScreenerPage() {
   return (
     <div className="flex flex-col gap-4">
       {/* Title + summary — Loay slide 2: page title + a single description
-          line carrying the live company count and the newest price date. */}
+          line carrying the live company count and the newest price date.
+          Strings are inlined here (NOT routed through `label("screener.title")`
+          / `label("screener.summary", ...)`) because the DB-side template
+          carried a stale "{{shown}}" placeholder and admin edits aren't
+          expected on these page-chrome strings. If you ever want admin
+          editability back, re-route both through useLabel and clear the
+          ui_labels rows so the seed re-inserts the new template. */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold text-brand-900">{label("screener.title")}</h1>
+        <h1 className="text-2xl font-semibold text-brand-900">
+          {locale === "ar"
+            ? "تحليل أداء الأسهم واختيار أسهم المحفظة الاستثمارية"
+            : "Stock Performance Analysis & Portfolio Selection"}
+        </h1>
         <div className="rounded-md bg-brand-900 px-4 py-2 text-sm font-semibold text-white">
           {rows === null
             ? t("common.loading")
-            : label("screener.summary", {
-                total: rows.length,
-                updated: lastUpdate ?? "—",
-              })}
+            : locale === "ar"
+              ? `تضم سوق الأسهم السعودية (تداول) حاليًا ${rows.length} شركة مدرجة — آخر تاريخ لتحديث أسعار الأسهم: ${lastUpdate ?? "—"}`
+              : `The Saudi Exchange (Tadawul) currently lists ${rows.length} companies — Last price update: ${lastUpdate ?? "—"}`}
         </div>
       </div>
 
