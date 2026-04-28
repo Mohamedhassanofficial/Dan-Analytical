@@ -96,7 +96,8 @@ button {
      `numToneClass` (positive = ink, zero/negative = danger). Body default
      covers text cells via `html { color: ink }`.                       */
   .screener-cell {
-    @apply px-3 py-2 text-sm whitespace-nowrap text-center;
+    @apply px-3 py-2 text-sm whitespace-nowrap text-center
+           border-r border-brand-100;
   }
 
   /* Negative numeric cell — light pink background per PPTX slide 91. The
@@ -116,7 +117,7 @@ button {
   .badge-risk-very-aggressive   { @apply badge bg-risk-veryAggressive text-risk-veryAggressiveFg; }
   .screener-th {
     @apply px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white
-           bg-brand-800 border-b border-brand-900 whitespace-nowrap;
+           bg-brand-800 border-b border-r border-brand-900 whitespace-nowrap;
   }
   /* Group-header row above the column titles (Loay slide 4):
      navy band labelled "Risk Measurement Ratios" / "Financial Ratios".
@@ -126,11 +127,11 @@ button {
      ثابتة لا تتحرك في حالة الضغط على scrolldown". */
   .screener-group-header {
     @apply sticky z-40 px-3 py-2 text-center text-sm font-bold tracking-wide
-           text-white bg-brand-900 border-b border-brand-700;
+           text-white bg-brand-900 border-b border-r border-brand-700;
     top: 0;
   }
   .screener-group-blank {
-    @apply sticky z-40 bg-brand-900 border-b border-brand-700;
+    @apply sticky z-40 bg-brand-900 border-b border-r border-brand-700;
     top: 0;
   }
   .screener-filter-cell {
