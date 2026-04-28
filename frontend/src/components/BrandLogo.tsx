@@ -36,7 +36,11 @@ export default function BrandLogo({
   const src = locale === "ar" ? "/dan-logo-ar.svg" : "/dan-logo.svg";
   const alt = locale === "ar" ? "دان التحليلي" : "DAN Analytical Applications";
 
-  const heightClass = size === "lg" ? "h-12 sm:h-14" : "h-10";
+  // Loay asked for the brand mark to read prominently on every screen.
+  // Sidebar (md) → 80-96 px, legacy top-bar slot (lg) → 96-112 px.
+  // All four classes ship in the default Tailwind scale; sm:h-22 doesn't
+  // exist so the prior pass would have collapsed md to h-20 on sm+.
+  const heightClass = size === "lg" ? "h-24 sm:h-28" : "h-20 sm:h-24";
   const content = (
     <span className={`inline-flex items-center gap-1 ${className}`} aria-label={alt}>
       <img
