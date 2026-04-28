@@ -314,6 +314,10 @@ export default function ScreenerPage() {
     locale === "ar"
       ? r.name_ar || r.name_en || r.ticker_suffix
       : r.name_en || r.name_ar || r.ticker_suffix;
+  const displayIndustry = (r: StockRow) =>
+    locale === "ar"
+      ? r.industry_ar || r.industry_en || "—"
+      : r.industry_en || r.industry_ar || "—";
 
   const ALL_NUMERIC_COLS = [...RISK_COLS, ...FINANCIAL_COLS];
 
@@ -421,15 +425,16 @@ export default function ScreenerPage() {
       {/* Table */}
       <div className="card p-0 overflow-hidden">
         <div className="relative max-h-[75vh] overflow-auto">
-          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 2)}px` }}>
+          <table className="border-collapse text-sm" style={{ minWidth: `${120 * (ALL_NUMERIC_COLS.length + DISCLOSURE_DATE_COLS.length + 2) + 288 /* 18rem industry */}px` }}>
             <thead>
               {/* Group-header row — Loay slide 4: every numeric column lives
                   under either "Risk Measurement Ratios" or "Financial
-                  Ratios". Identifier + actions cells stay blank.
-                  Sector code + Industry both removed per slide 2 markup
-                  ("حذف الحقل") and slides 9/11 column list. */}
+                  Ratios". Identifier (Symbol + Name + Industry) +
+                  actions cells stay blank. Sector code column was removed
+                  per slide 2 ("حذف الحقل"); Industry stays per Loay's
+                  follow-up — wide enough that the AR text won't truncate. */}
               <tr className="screener-group-row">
-                <th colSpan={2} className="screener-group-blank" />
+                <th colSpan={3} className="screener-group-blank" />
                 <th
                   colSpan={RISK_COLS.length + 1 /* + risk_ranking */}
                   className="screener-group-header"
@@ -447,6 +452,7 @@ export default function ScreenerPage() {
               <tr>
                 <ThSticky colIndex={0}>{label("screener.col_symbol")}</ThSticky>
                 <ThSticky colIndex={1}>{label("screener.col_name")}</ThSticky>
+                <Th minWidth="18rem">{label("screener.col_industry")}</Th>
                 {RISK_COLS.map((c) => (
                   <Th key={c.key as string}>
                     <span className="inline-flex items-center gap-1.5">
@@ -496,6 +502,7 @@ export default function ScreenerPage() {
                         <span className="text-xs text-muted">{r.ticker_suffix}</span>
                       </div>
                     </TdSticky>
+                    <td className="screener-cell text-ink whitespace-normal">{displayIndustry(r)}</td>
 
                     {/* Risk indicators (except risk_ranking, which is separate) */}
                     {RISK_COLS.slice(0, -1).map((c) => {
@@ -576,7 +583,7 @@ export default function ScreenerPage() {
               {rows !== null && filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={RISK_COLS.length + FINANCIAL_COLS.length + DISCLOSURE_DATE_COLS.length + 2}
+                    colSpan={RISK_COLS.length + FINANCIAL_COLS.length + DISCLOSURE_DATE_COLS.length + 3}
                     className="py-10 text-center text-muted"
                   >
                     {label("screener.empty")}
