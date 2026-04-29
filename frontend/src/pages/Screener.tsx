@@ -360,6 +360,16 @@ export default function ScreenerPage() {
               ? `تضم سوق الأسهم السعودية (تداول) حاليًا ${rows.length} شركة مدرجة — آخر تاريخ لتحديث أسعار الأسهم: ${lastUpdate ?? "—"}`
               : `The Saudi Exchange (Tadawul) currently lists ${rows.length} companies — Last price update: ${lastUpdate ?? "—"}`}
         </div>
+        {/* Filtered count — surfaces when the user has applied any filter so
+            it's obvious how many rows passed. Hidden when no filter active
+            and table shows everything. */}
+        {rows !== null && (riskFilters.length > 0 || financialFilters.length > 0 || textFilter.trim() !== "") && (
+          <div className="rounded-md border border-brand-300 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-900">
+            {locale === "ar"
+              ? `معروض: ${filtered.length} من ${rows.length} شركة بعد الفلترة`
+              : `Showing: ${filtered.length} of ${rows.length} companies after filtering`}
+          </div>
+        )}
       </div>
 
       {error && <div className="badge-error w-fit">{error}</div>}
