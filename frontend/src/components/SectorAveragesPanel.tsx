@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Calculator, Filter, RefreshCw } from "lucide-react";
+import { Filter, RefreshCw } from "lucide-react";
 import {
   StocksAPI,
   type SectorAverages,
@@ -153,17 +153,16 @@ export default function SectorAveragesPanel() {
             {label("sector_avg.btn_financial")}
           </button>
 
-          {selectedSector && group && (
-            <button
-              className="btn-primary"
-              onClick={() => fetchAverages(selectedSector)}
-              disabled={loading}
-              title={label("sector_avg.refresh")}
-            >
-              <Calculator size={14} />
-              {label("sector_avg.btn_calculate")}
-              {loading && <RefreshCw size={12} className="ms-1 animate-spin" />}
-            </button>
+          {/* Loay slide 8: removed the standalone "احتساب" button. Both
+              pickSector() and pickGroup() already call fetchAverages
+              themselves, so picking the Risk or Financial button (or
+              changing the sector) auto-renders the result cards. The
+              extra Calculate button was redundant. */}
+          {loading && (
+            <span className="inline-flex items-center text-xs text-muted">
+              <RefreshCw size={12} className="me-1 animate-spin" />
+              {label("sector_avg.refresh")}
+            </span>
           )}
         </div>
 
