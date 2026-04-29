@@ -107,6 +107,7 @@ export default function IndicatorFilterModal({
       const value = c.fmt === "pct" ? raw / 100 : raw;
       out.push({ key: c.key, op: row.op, value });
     }
+    console.log("[FilterModal] apply →", JSON.stringify(out));
     onApply(out);
     onClose();
   }
@@ -158,7 +159,8 @@ export default function IndicatorFilterModal({
                     <td className="py-2">{label(c.labelKey)}</td>
                     <td className="py-2">
                       <select
-                        className="input h-8 py-1 text-xs"
+                        dir="ltr"
+                        className="input h-8 py-1 text-xs text-center"
                         value={row.op}
                         onChange={(e) => update(c.key, { op: e.target.value as OpFilterOperator })}
                       >
@@ -170,6 +172,7 @@ export default function IndicatorFilterModal({
                     <td className="py-2">
                       <div className="relative">
                         <input
+                          dir="ltr"
                           type="number"
                           step="any"
                           className={`input h-8 py-1 text-xs ${c.fmt === "pct" ? "pe-7" : ""}`}
