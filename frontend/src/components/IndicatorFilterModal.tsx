@@ -119,7 +119,7 @@ export default function IndicatorFilterModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl rounded-xl bg-white shadow-2xl"
+        className="w-full max-w-3xl rounded-xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -146,8 +146,8 @@ export default function IndicatorFilterModal({
             <thead>
               <tr className="text-muted">
                 <th className="py-2 text-start">{label("screener.filter_indicator")}</th>
-                <th className="py-2 w-28 text-start">{label("screener.filter_operator")}</th>
-                <th className="py-2 w-40 text-start">{label("screener.filter_value")}</th>
+                <th className="py-2 w-32 text-start">{label("screener.filter_operator")}</th>
+                <th className="py-2 w-52 text-start">{label("screener.filter_value")}</th>
               </tr>
             </thead>
             <tbody>
@@ -159,7 +159,7 @@ export default function IndicatorFilterModal({
                     <td className="py-2">
                       <select
                         dir="ltr"
-                        className="input h-8 py-1 text-xs text-center"
+                        className="input h-10 px-3 py-2 text-sm font-medium text-center"
                         value={row.op}
                         onChange={(e) => update(c.key, { op: e.target.value as OpFilterOperator })}
                       >
@@ -174,13 +174,13 @@ export default function IndicatorFilterModal({
                           dir="ltr"
                           type="number"
                           step="any"
-                          className={`input h-8 py-1 text-xs ${c.fmt === "pct" ? "pe-7" : ""}`}
+                          className={`input h-10 px-3 py-2 text-sm font-medium tabular-nums ${c.fmt === "pct" ? "pe-8" : ""}`}
                           value={row.value}
                           placeholder={c.fmt === "pct" ? "4" : "0.5"}
                           onChange={(e) => update(c.key, { value: e.target.value })}
                         />
                         {c.fmt === "pct" && (
-                          <span className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted">
+                          <span className="pointer-events-none absolute end-2.5 top-1/2 -translate-y-1/2 text-sm font-medium text-muted">
                             %
                           </span>
                         )}
