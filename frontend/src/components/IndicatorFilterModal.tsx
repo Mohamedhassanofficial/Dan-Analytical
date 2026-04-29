@@ -107,7 +107,6 @@ export default function IndicatorFilterModal({
       const value = c.fmt === "pct" ? raw / 100 : raw;
       out.push({ key: c.key, op: row.op, value });
     }
-    console.log("[FilterModal] apply →", JSON.stringify(out));
     onApply(out);
     onClose();
   }

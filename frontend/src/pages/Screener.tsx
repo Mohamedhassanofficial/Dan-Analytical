@@ -233,21 +233,6 @@ export default function ScreenerPage() {
   // Per Loay slide #3: dropdown shows the human sector name + count, not
   const filtered = useMemo(() => {
     if (!rows) return [];
-    // Debug: log when filters are active
-    if (financialFilters.length > 0) {
-      console.log("[Screener] financialFilters active:", JSON.stringify(financialFilters));
-      if (rows.length > 0) {
-        const sample = rows[0];
-        for (const f of financialFilters) {
-          const raw = sample[f.key as keyof StockRow];
-          console.log(`[Screener] sample ${sample.symbol} ${f.key} = ${raw} (type: ${typeof raw}), filter: ${f.op} ${f.value}`);
-          console.log(`[Screener] passesFilter result: ${passesFilter(sample, f)}`);
-        }
-      }
-    }
-    if (riskFilters.length > 0) {
-      console.log("[Screener] riskFilters active:", JSON.stringify(riskFilters));
-    }
     const q = textFilter.trim().toLowerCase();
     return rows.filter((r) => {
       if (q) {
