@@ -151,13 +151,18 @@ function passesFilter(row: StockRow, f: OpFilter): boolean {
   if (raw === null || raw === undefined || raw === "") return false;
   const v = Number(raw); // accepts both number-typed and string-typed inputs
   if (!Number.isFinite(v)) return false;
+  // For pct columns f.value is already in decimal form (4% → 0.04), so a
+  // 1e-4 tolerance on the equality comparison still distinguishes 4.00%
+  // from 4.01%. The earlier 1e-9 was too strict for Decimal-encoded
+  // values that round to 4 dp but not all the way to machine epsilon.
   switch (f.op) {
-    case "=":  return Math.abs(v - f.value) < 1e-9;
+    case "=":  return Math.abs(v - f.value) < 1e-4;
     case "<":  return v < f.value;
     case ">":  return v > f.value;
     case "<=": return v <= f.value;
     case ">=": return v >= f.value;
   }
+  return false;
 }
 
 // ────────────────────────────────────────────────────────────────────────────
