@@ -1,15 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Lightbulb, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLabel } from "@/contexts/LabelsContext";
 
 /**
- * Grouped filter modal — used for BOTH the Risk-indicator group and the
- * Financial-indicator group (per PPTX slide 82: "=, <, > وغيرها" per indicator).
+ * Grouped filter modal — used for both the Risk-indicator group and the
+ * Financial-indicator group (per PPTX slide 82: "=, <, > وغيرها" per
+ * indicator).
  *
- * The parent passes the column list (label key + data key); the user picks
- * which columns to filter, chooses a comparison operator, and enters a value.
- * "Apply" returns the active filters to the parent.
+ * Clean rewrite (2026-04): the previous version coupled an enable-checkbox
+ * to a disabled input, which made the whole control feel frozen until the
+ * user clicked the box first. The new flow drops the checkbox entirely —
+ * a row is "active" iff its value field is non-empty. Apply collects all
+ * rows with a value and converts pct columns from user units (4 = 4%) to
+ * the decimal unit the StockRow uses (0.04) so the comparison in
+ * passesFilter sees matching scales.
  */
 
 export type OpFilterOperator = "=" | "<" | ">" | "<=" | ">=";
@@ -23,12 +28,11 @@ export interface OpFilter {
 }
 
 export interface FilterableColumn {
-  key: string;       // matches StockRow field name (e.g. "pe_ratio")
-  labelKey: string;  // ui_labels key (e.g. "screener.col_pe")
+  key: string;
+  labelKey: string;
   /** "pct" columns are stored as decimals in the DB (0.04 = 4%). The
-   *  modal accepts and displays the user-friendly percentage value
-   *  (4) and converts to/from the decimal at apply/seed time so the
-   *  passesFilter comparison sees matching units. */
+   *  modal accepts and displays the friendly percentage and converts
+   *  to/from the decimal at apply/seed time. */
   fmt?: "num" | "pct";
 }
 
@@ -41,11 +45,29 @@ interface Props {
   onClose: () => void;
 }
 
-type DraftRow = {
-  enabled: boolean;
+interface DraftRow {
   op: OpFilterOperator;
-  value: string;  // string because empty state matters
-};
+  value: string; // empty string = filter inactive for this row
+}
+
+function buildSeed(columns: FilterableColumn[], current: OpFilter[]): Record<string, DraftRow> {
+  const out: Record<string, DraftRow> = {};
+  for (const c of columns) {
+    const existing = current.find((f) => f.key === c.key);
+    if (!existing) {
+      out[c.key] = { op: ">=", value: "" };
+      continue;
+    }
+    // pct: stored as decimal (0.04) → display as percent (4). Round to 4 dp
+    // to absorb the float drift Number() introduces on Decimal-encoded values.
+    const display =
+      c.fmt === "pct"
+        ? String(Math.round(existing.value * 1_000_000) / 10_000)
+        : String(existing.value);
+    out[c.key] = { op: existing.op, value: display };
+  }
+  return out;
+}
 
 export default function IndicatorFilterModal({
   open, title, columns, current, onApply, onClose,
@@ -53,57 +75,43 @@ export default function IndicatorFilterModal({
   const { t } = useTranslation();
   const label = useLabel();
 
-  // Seed draft state from the current filter list each time we open.
-  // pct columns: stored value is a decimal (0.04); display the friendly 4.
-  const seed = useMemo<Record<string, DraftRow>>(() => {
-    const out: Record<string, DraftRow> = {};
-    for (const c of columns) {
-      const existing = current.find((f) => f.key === c.key);
-      const displayValue = existing
-        ? (c.fmt === "pct" ? String(existing.value * 100) : String(existing.value))
-        : "";
-      out[c.key] = existing
-        ? { enabled: true, op: existing.op, value: displayValue }
-        : { enabled: false, op: ">=", value: "" };
-    }
-    return out;
-  }, [columns, current]);
+  const [draft, setDraft] = useState<Record<string, DraftRow>>(() => buildSeed(columns, current));
 
-  const [draft, setDraft] = useState<Record<string, DraftRow>>(seed);
-
+  // Reset the draft to whatever the parent currently holds whenever the
+  // modal opens. Closing-without-apply discards local edits intentionally.
   useEffect(() => {
-    if (open) setDraft(seed);
-  }, [open, seed]);
+    if (open) setDraft(buildSeed(columns, current));
+  }, [open, columns, current]);
 
   if (!open) return null;
 
   function update(key: string, patch: Partial<DraftRow>) {
-    setDraft((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
+    setDraft((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
   }
 
-  function clear() {
+  function clearAll() {
     const next: Record<string, DraftRow> = {};
-    for (const c of columns) next[c.key] = { enabled: false, op: ">=", value: "" };
+    for (const c of columns) next[c.key] = { op: ">=", value: "" };
     setDraft(next);
   }
 
   function apply() {
     const out: OpFilter[] = [];
     for (const c of columns) {
-      const d = draft[c.key];
-      if (!d.enabled) continue;
-      const raw = parseFloat(d.value);
-      if (Number.isNaN(raw)) continue;
-      // pct columns: user types "4" meaning 4%, store as 0.04 to match
-      // the decimal-encoded ROE / yield / vol fields on the StockRow.
-      const v = c.fmt === "pct" ? raw / 100 : raw;
-      out.push({ key: c.key, op: d.op, value: v });
+      const row = draft[c.key];
+      if (!row || row.value === "") continue; // empty value = inactive
+      const raw = parseFloat(row.value);
+      if (!Number.isFinite(raw)) continue;
+      // pct columns: user types "4" meaning 4%, store 0.04 to match the
+      // decimal-encoded StockRow field that passesFilter compares against.
+      const value = c.fmt === "pct" ? raw / 100 : raw;
+      out.push({ key: c.key, op: row.op, value });
     }
     onApply(out);
     onClose();
   }
 
-  const activeCount = Object.values(draft).filter((d) => d.enabled && d.value !== "").length;
+  const activeCount = Object.values(draft).filter((d) => d.value !== "").length;
 
   return (
     <div
@@ -124,7 +132,6 @@ export default function IndicatorFilterModal({
 
         {/* Body */}
         <div className="max-h-[60vh] overflow-y-auto px-5 py-4">
-          {/* Help banner — Loay slide 6 */}
           <div className="mb-4 flex items-start gap-2 rounded-md border border-brand-200 bg-brand-50 p-3 text-sm">
             <Lightbulb size={18} className="mt-0.5 flex-none text-brand-700" />
             <div className="leading-snug text-brand-900">
@@ -137,36 +144,22 @@ export default function IndicatorFilterModal({
 
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-muted text-start">
-                <th className="w-8 py-2"></th>
-                <th className="py-2 text-start">
-                  {label("screener.filter_indicator")}
-                </th>
-                <th className="py-2 w-28 text-start">
-                  {label("screener.filter_operator")}
-                </th>
-                <th className="py-2 w-40 text-start">
-                  {label("screener.filter_value")}
-                </th>
+              <tr className="text-muted">
+                <th className="py-2 text-start">{label("screener.filter_indicator")}</th>
+                <th className="py-2 w-28 text-start">{label("screener.filter_operator")}</th>
+                <th className="py-2 w-40 text-start">{label("screener.filter_value")}</th>
               </tr>
             </thead>
             <tbody>
               {columns.map((c) => {
-                const d = draft[c.key];
+                const row = draft[c.key] ?? { op: ">=" as OpFilterOperator, value: "" };
                 return (
                   <tr key={c.key} className="border-t border-brand-100">
-                    <td className="py-2">
-                      <input
-                        type="checkbox"
-                        checked={d.enabled}
-                        onChange={(e) => update(c.key, { enabled: e.target.checked })}
-                      />
-                    </td>
                     <td className="py-2">{label(c.labelKey)}</td>
                     <td className="py-2">
                       <select
                         className="input h-8 py-1 text-xs"
-                        value={d.op}
+                        value={row.op}
                         onChange={(e) => update(c.key, { op: e.target.value as OpFilterOperator })}
                       >
                         {OPERATORS.map((op) => (
@@ -180,17 +173,9 @@ export default function IndicatorFilterModal({
                           type="number"
                           step="any"
                           className={`input h-8 py-1 text-xs ${c.fmt === "pct" ? "pe-7" : ""}`}
-                          value={d.value}
+                          value={row.value}
                           placeholder={c.fmt === "pct" ? "4" : "0.5"}
-                          onChange={(e) => {
-                            // Auto-tick the row when the user types a value;
-                            // auto-untick when they clear it. The checkbox
-                            // is now just a "disable without losing the value"
-                            // toggle. Loay flagged that requiring a manual
-                            // tick was non-obvious — the input felt frozen.
-                            const next = e.target.value;
-                            update(c.key, { value: next, enabled: next !== "" });
-                          }}
+                          onChange={(e) => update(c.key, { value: e.target.value })}
                         />
                         {c.fmt === "pct" && (
                           <span className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted">
@@ -208,17 +193,17 @@ export default function IndicatorFilterModal({
 
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-brand-100 px-5 py-3">
-          <button className="btn-secondary" onClick={clear}>
-            {label("screener.filter_clear_group")}
+          <button onClick={clearAll} className="btn-ghost">
+            {label("screener.clear_filters_modal")}
           </button>
-          <div className="flex gap-2">
-            <button className="btn-ghost" onClick={onClose}>
+          <div className="flex items-center gap-2">
+            <button onClick={onClose} className="btn-secondary">
               {t("common.cancel")}
             </button>
-            <button className="btn-primary" onClick={apply}>
-              {label("screener.filter_apply")}
+            <button onClick={apply} className="btn-primary">
+              {label("screener.apply_filters")}
               {activeCount > 0 && (
-                <span className="ms-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                <span className="ms-1 rounded-full bg-white text-brand-900 px-2 py-0.5 text-xs">
                   {activeCount}
                 </span>
               )}
