@@ -544,7 +544,7 @@ export default function ScreenerPage() {
                     </td>
 
                     {/* Risk indicators (except risk_ranking, which is separate) */}
-                    {RISK_COLS.slice(0, -1).map((c) => {
+                    {RISK_COLS.map((c) => {
                       const v = r[c.key] as number | null;
                       return (
                         <td
